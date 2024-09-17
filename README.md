@@ -7,7 +7,7 @@ Versão pensada para o GORM.
 **Product**
 | Name | Type |
 | :---: | :---: |
-| Id | string | ==Primary key==
+| ==Id== | string | 
 | Name | string |
 | Price | float32 |
 | NCM | string |

@@ -24,7 +24,7 @@ Versão pensada para o **GORM**.
 | Address | uint16 | Foreign key
 
 
-`
+```
 type User struct {
 	gorm.Model
 	Name string
@@ -55,4 +55,4 @@ type Class struct {
 	Name string
 	Description string
 }
-`
+```

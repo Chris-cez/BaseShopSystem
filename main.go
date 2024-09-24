@@ -7,6 +7,9 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/mauricio3g/golang-fiber/database"
 	"net/http"
+	"os"
+	"github.com/Chris-cez/BaseShopSystem/storage"
+	"github.com/Chris-cez/BaseShopSystem/models"
 )
 
 type Product struct {
@@ -70,6 +73,15 @@ func main()  {
 	err := godotenv.Load(".env")
 	if err != nil {
 		log.Fatal("Error loading .env file\n", err)
+	}
+
+	config := &storage.Config{
+		Host:     os.Getenv("DB_HOST"),
+		Port:     os.Getenv("DB_PORT"),
+		User:     os.Getenv("DB_USER"),
+		Password: os.Getenv("DB_PASSWORD"),
+		DbName:   os.Getenv("DB_NAME"),
+		SSLMode:  os.Getenv("DB_SSLMODE"),
 	}
 
 	db, err := storage.NewConnection(config)

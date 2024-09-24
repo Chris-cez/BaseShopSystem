@@ -18,7 +18,7 @@ type Product struct {
 	DeletedAt 	gorm.DeletedAt 	`gorm:"index" json:"deleted_at"`
 }
 
-func migrateProducts(db *gorm.DB) error{
+func MigrateProducts(db *gorm.DB) error{
 	err := db.AutoMigrate(&Product{})
 	return err
 }

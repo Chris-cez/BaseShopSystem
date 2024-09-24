@@ -10,6 +10,7 @@ import (
 	"os"
 	"github.com/Chris-cez/BaseShopSystem/storage"
 	"github.com/Chris-cez/BaseShopSystem/models"
+	"fmt"
 )
 
 type Product struct {
@@ -56,6 +57,50 @@ func (r *Repository) GetProducts(c *fiber.Ctx) error {
 	return nil
 }
 
+func(r *Repository) DeleteProduct(c *fiber.Ctx) error {
+	productModel := models.Product{}
+
+	id := c.Params("id")
+	if id == "" {
+		context.Status(http.StatusInternalServerError).JSON(
+			&fiber.Map{"message": "id can not be empty"})
+		return nil
+	}
+	err := r.DB.Delete(productModel, id).Error
+	if err != nil {
+		context.Status(http.StatusBadRequest).JSON(
+			&fiber.Map{"message": "could not delete product"})
+		return err
+	}
+
+	c.Status(http.StatusOK).JSON(
+		&fiber.Map{"message": "product deleted successfully"})
+	return nil
+}
+
+func(r *Repository) GetProductByID(c *fiber.Ctx) error {
+	id := c.Params("id")
+	productModel := models.Product{}
+
+	if id == "" {
+		context.Status(http.StatusInternalServerError).JSON(
+			&fiber.Map{"message": "id can not be empty"})
+		return nil
+	}
+	fmt.Println("The ID is",id)
+
+	err := r.DB.Where("id = ?", id).First(productModel).Error
+	if err != nil {
+		context.Status(http.StatusBadRequest).JSON(
+			&fiber.Map{"message": "could not get the product"})
+		return err
+	}
+	c.Status(http.StatusOK).JSON(
+		&fiber.Map{"message": "product fetched successfully", 
+		"data": productModel})
+	return nil
+}
+
 type Repository struct {
 	DB *gorm.DB
 }
@@ -88,6 +133,12 @@ func main()  {
 	if err != nil {
 		log.Fatal("Error connecting to database\n", err)
 	}
+
+	err = models.migrateProducts(db)
+	if err != nil {
+		log.Fatal("Error migrating products\n", err)
+	}
+
 	r := Repository{DB: db}
 
 	app := fiber.New()

@@ -7,7 +7,7 @@ Versão pensada para o **GORM**.
 **Product**
 | Name | Type |
 | :---: | :---: |
-| Id | string | Primary key
+| Id | Gorm.model | Primary key
 | Name | string |
 | Price | float32 |
 | NCM | string |
@@ -18,11 +18,33 @@ Versão pensada para o **GORM**.
 **Client**
 | Name | Type |
 | :---: | :---: |
-| Id | string | Primary key
+| Id | Gorm.model | Primary key
 | Name | string |
 | CPF | int32 | 
-| Address | uint16 | Foreign key
+| Address | int | Foreign key
 
+**Address**
+| Name | Type |
+| :---: | :---: |
+| Id | Gorm.model | Primary key
+| Street | string |
+| City | string |
+| State | string |
+
+**User**
+| Name | Type |
+| :---: | :---: |
+| Id | Gorm.model | Primary Key
+| Name | string |
+| CPF | uint32 |
+| Id_address | int | Foreign Key
+
+**Class**
+| Name | Type |
+| :---: | :---: |
+| Id | Gorm.model | Primary Key
+| Name | string |
+| Description | string |
 
 ```
 type User struct {
@@ -47,7 +69,7 @@ type Product struct {
 	NCM   string
 	UM    string
 	Description string
-	Id_Class uint8
+	Id_Class int
 }
 
 type Class struct {
@@ -56,3 +78,4 @@ type Class struct {
 	Description string
 }
 ```
+

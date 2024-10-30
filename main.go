@@ -1,44 +1,44 @@
 package main
 
 import (
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
-	"github.com/gofiber/fiber/v2"
-	"github.com/joho/godotenv"
-	"github.com/mauricio3g/golang-fiber/database"
+	"fmt"
+	"log"
 	"net/http"
 	"os"
-	"github.com/Chris-cez/BaseShopSystem/storage"
+
 	"github.com/Chris-cez/BaseShopSystem/models"
-	"fmt"
+	"github.com/Chris-cez/BaseShopSystem/storage"
+	"github.com/gofiber/fiber/v2"
+	"github.com/joho/godotenv"
+	"gorm.io/gorm"
 )
 
 type Product struct {
-	Code  string		`json:"code"`
-	Price float32 		`json:"price"`
-	Name  string		`json:"name"`
-	NCM   string		`json:"ncm"`
-	UM    string		`json:"um"`
-	Description string	`json:"description"`
+	Code        string  `json:"code"`
+	Price       float32 `json:"price"`
+	Name        string  `json:"name"`
+	NCM         string  `json:"ncm"`
+	UM          string  `json:"um"`
+	Description string  `json:"description"`
 }
 
 func (r *Repository) CreateProduct(c *fiber.Ctx) error {
 	product := Product{}
 
-	err := context.BodyParser(&product)
+	err := c.BodyParser(&product)
 	if err != nil {
-		context.Status(http.StatusUnprocessableEntity).JSON(
+		c.Status(http.StatusUnprocessableEntity).JSON(
 			&fiber.Map{"message": "Request failed"})
 		return err
 	}
-	err := r.DB.Create(&product).Error
+	err = r.DB.Create(&product).Error
 	if err != nil {
-		context.Status(http.StatusBadRequest).JSON(
+		c.Status(http.StatusBadRequest).JSON(
 			&fiber.Map{"message": "could not create product"})
 		return err
 	}
 
-	context.Status(http.StatusOK).JSON(
+	c.Status(http.StatusOK).JSON(
 		&fiber.Map{"product": "product has been added"})
 	return nil
 }
@@ -47,28 +47,28 @@ func (r *Repository) GetProducts(c *fiber.Ctx) error {
 	productModels := []models.Product{}
 	err := r.DB.Find(&productModels).Error
 	if err != nil {
-		context.Status(http.StatusBadRequest).JSON(
+		c.Status(http.StatusBadRequest).JSON(
 			&fiber.Map{"message": "could not get products"})
 		return err
 	}
-	context.Status(http.StatusOK).JSON(
-		&fiber.Map{"message": "products fetched successfully", 
-		"data": productModels})
+	c.Status(http.StatusOK).JSON(
+		&fiber.Map{"message": "products fetched successfully",
+			"data": productModels})
 	return nil
 }
 
-func(r *Repository) DeleteProduct(c *fiber.Ctx) error {
+func (r *Repository) DeleteProduct(c *fiber.Ctx) error {
 	productModel := models.Product{}
 
 	id := c.Params("id")
 	if id == "" {
-		context.Status(http.StatusInternalServerError).JSON(
+		c.Status(http.StatusInternalServerError).JSON(
 			&fiber.Map{"message": "id can not be empty"})
 		return nil
 	}
 	err := r.DB.Delete(productModel, id).Error
 	if err != nil {
-		context.Status(http.StatusBadRequest).JSON(
+		c.Status(http.StatusBadRequest).JSON(
 			&fiber.Map{"message": "could not delete product"})
 		return err
 	}
@@ -78,26 +78,26 @@ func(r *Repository) DeleteProduct(c *fiber.Ctx) error {
 	return nil
 }
 
-func(r *Repository) GetProductByID(c *fiber.Ctx) error {
+func (r *Repository) GetProductByID(c *fiber.Ctx) error {
 	id := c.Params("id")
 	productModel := models.Product{}
 
 	if id == "" {
-		context.Status(http.StatusInternalServerError).JSON(
+		c.Status(http.StatusInternalServerError).JSON(
 			&fiber.Map{"message": "id can not be empty"})
 		return nil
 	}
-	fmt.Println("The ID is",id)
+	fmt.Println("The ID is", id)
 
 	err := r.DB.Where("id = ?", id).First(productModel).Error
 	if err != nil {
-		context.Status(http.StatusBadRequest).JSON(
+		c.Status(http.StatusBadRequest).JSON(
 			&fiber.Map{"message": "could not get the product"})
 		return err
 	}
 	c.Status(http.StatusOK).JSON(
-		&fiber.Map{"message": "product fetched successfully", 
-		"data": productModel})
+		&fiber.Map{"message": "product fetched successfully",
+			"data": productModel})
 	return nil
 }
 
@@ -105,16 +105,15 @@ type Repository struct {
 	DB *gorm.DB
 }
 
-func(r *Repository) SetupRoutes(app *fiber.App) {
+func (r *Repository) SetupRoutes(app *fiber.App) {
 	api := app.Group("/api")
 	api.Post("/products", r.CreateProduct)
 	api.Get("/products", r.GetProducts)
 	api.Get("/products/:id", r.GetProductByID)
-	api.Put("/products/:id", r.UpdateProduct)
 	api.Delete("/products/:id", r.DeleteProduct)
 }
 
-func main()  {
+func main() {
 	err := godotenv.Load(".env")
 	if err != nil {
 		log.Fatal("Error loading .env file\n", err)
@@ -134,17 +133,16 @@ func main()  {
 		log.Fatal("Error connecting to database\n", err)
 	}
 
-	err = models.migrateProducts(db)
+	err = models.MigrateProducts(db)
 	if err != nil {
 		log.Fatal("Error migrating products\n", err)
 	}
 
-	r := Repository{DB: db}
+	r := Repository{
+		DB: db,
+	}
 
 	app := fiber.New()
-	database.ConnectDB()
-	routes.SetupRoutes(app)
-	app.Listen(":8080")
+	r.SetupRoutes(app)
+	log.Fatal(app.Listen(":8080"))
 }
-
-

@@ -15,14 +15,6 @@ Versão pensada para o **GORM**.
 | Class | uint8 | Foreign key
 | Description | string |
 
-**Client**
-| Name | Type |
-| :---: | :---: |
-| Id | Gorm.model | Primary key
-| Name | string |
-| CPF | int32 | 
-| Address | int | Foreign key
-
 **Address**
 | Name | Type |
 | :---: | :---: |

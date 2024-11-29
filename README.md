@@ -1,73 +1,114 @@
-# Base Shop System
-Versão básica e open-source do código usado na criação de um sistema de uma loja real. A versão completa com os dados especificos do projeto será criada e vendida de forma privada. Se tiver interesse na versão paga, tratar com o criador do repositorio original.
+# Sistema de vendas base
+Versão básica e open-source do código usado na criação de um sistema de uma loja real. A versão completa com os dados especificos do projeto será criada e vendida de forma privada. Este documento descreve a estrutura de dados utilizada para representar uma Nota Fiscal Eletrônica (NF-e) em um sistema de vendas.
 
-## Banco de Dados
-Versão pensada para o **GORM**.
+## Tabelas do Banco de Dados
 
-**Product**
-| Name | Type |
-| :---: | :---: |
-| Id | Gorm.model | Primary key
-| Name | string |
-| Price | float32 |
-| NCM | string |
-| UM | string |
-| Class | uint8 | Foreign key
-| Description | string |
+A estrutura é baseada em múltiplas tabelas relacionadas para garantir a integridade e eficiência dos dados. Pensada para posteriormente ser usada com GORM.
 
-**Address**
-| Name | Type |
-| :---: | :---: |
-| Id | Gorm.model | Primary key
-| Street | string |
-| City | string |
-| State | string |
+**1. `Empresa` (Dados da Empresa - Hardcoded)**
 
-**User**
-| Name | Type |
-| :---: | :---: |
-| Id | Gorm.model | Primary Key
-| Name | string |
-| CPF | uint32 |
-| Id_address | int | Foreign Key
+| Campo             | Tipo de Dado | Descrição                                      |
+|--------------------|---------------|--------------------------------------------------|
+| `Nome`            | `string`      | Nome da empresa                                  |
+| `CNPJ`            | `string`      | Número do CNPJ da empresa                         |
+| `InscricaoEstadual` | `string`      | Inscrição Estadual da empresa                      |
 
-**Class**
-| Name | Type |
-| :---: | :---: |
-| Id | Gorm.model | Primary Key
-| Name | string |
-| Description | string |
 
-```
-type User struct {
-	gorm.Model
-	Name string
-	CPF  uint32
-	Id_address uint16
-}
+**2. `Endereco` (Dados de Endereço)**
 
-type Address struct {
-	gorm.Model
-	Street string
-	City   string
-	State  string
-}
+| Campo        | Tipo de Dado | Descrição                               |
+|--------------|---------------|-------------------------------------------|
+| `ID`         | `uint`        | Chave primária                           |
+| `Logradouro` | `string`      | Rua, Avenida, etc.                       |
+| `Numero`     | `string`      | Número do endereço                        |
+| `Complemento`| `string`      | Complemento do endereço                   |
+| `Bairro`      | `string`      | Bairro                                     |
+| `Municipio`  | `string`      | Município                                 |
+| `UF`         | `string`      | Unidade Federativa                       |
+| `CEP`        | `string`      | Código de Endereçamento Postal             |
 
-type Product struct {
-	gorm.Model
-	Code  string
-	Price float32
-	Name  string
-	NCM   string
-	UM    string
-	Description string
-	Id_Class int
-}
 
-type Class struct {
-	gorm.Model
-	Name string
-	Description string
-}
-```
+**3. `Cliente` (Dados do Cliente)**
 
+| Campo             | Tipo de Dado | Descrição                                      |
+|--------------------|---------------|--------------------------------------------------|
+| `ID`              | `uint`        | Chave primária                                   |
+| `Nome`            | `string`      | Nome do cliente                                  |
+| `CPF`             | `string`      | CPF do cliente (ou CNPJ)                         |
+| `CNPJ`            | `string`      | CNPJ do cliente (pode ser nulo)                   |
+| `EnderecoID`      | `uint`        | Chave estrangeira (Endereco.ID)                  |
+| `Telefone`         | `string`      | Telefone do cliente                              |
+| `Email`           | `string`      | Email do cliente                                 |
+
+
+**4. `ClasseProduto` (Classificação do Produto)**
+
+| Campo             | Tipo de Dado | Descrição                                      |
+|--------------------|---------------|--------------------------------------------------|
+| `ID`              | `uint`        | Chave primária                                   |
+| `Nome`            | `string`      | Nome da classe do produto                         |
+| `Descricao`       | `string`      | Descrição da classe do produto                    |
+| `NCM`             | `string`      | Código NCM da classe do produto                   |
+| `Tributacoes`     | `[]Tributacao` | Array de tributações aplicadas à classe do produto |
+
+
+**5. `Produto` (Dados do Produto)**
+
+| Campo             | Tipo de Dado | Descrição                                      |
+|--------------------|---------------|--------------------------------------------------|
+| `ID`              | `uint`        | Chave primária                                   |
+| `Nome`            | `string`      | Nome do produto                                  |
+| `Descricao`       | `string`      | Descrição do produto                             |
+| `ClasseProdutoID` | `uint`        | Chave estrangeira (ClasseProduto.ID)             |
+| `ValorUnitario`   | `float64`     | Valor unitário do produto                        |
+| `Unidade`         | `string`      | Unidade de medida (ex: UN, KG, M)               |
+| `Estoque`         | `int`         | Quantidade em estoque                            |
+
+
+**6. `Tributacao` (Dados de Tributação)**
+
+| Campo             | Tipo de Dado | Descrição                                      |
+|--------------------|---------------|--------------------------------------------------|
+| `ID`              | `uint`        | Chave primária                                   |
+| `Nome`            | `string`      | Nome do tributo (ex: ICMS, IPI, PIS, COFINS)     |
+| `Aliquota`        | `float64`     | Alíquota do tributo                             |
+| `TipoTributo`     | `string`      | Tipo de tributo                                 |
+
+
+
+**7. `ItemNotaFiscal` (Itens da Nota Fiscal)**
+
+| Campo             | Tipo de Dado | Descrição                                      |
+|--------------------|---------------|--------------------------------------------------|
+| `ID`              | `uint`        | Chave primária                                   |
+| `NotaFiscalID`    | `uint`        | Chave estrangeira (NotaFiscal.ID)                |
+| `ProdutoID`       | `uint`        | Chave estrangeira (Produto.ID)                   |
+| `Quantidade`      | `float64`     | Quantidade do produto                            |
+| `ValorUnitario`   | `float64`     | Valor unitário do produto na nota                |
+| `ValorTotal`      | `float64`     | Valor total do item (Quantidade * ValorUnitario) |
+
+
+**8. `NotaFiscal` (Dados da Nota Fiscal)**
+
+| Campo             | Tipo de Dado | Descrição                                      |
+|--------------------|---------------|--------------------------------------------------|
+| `ID`              | `gorm.Model`  | Chave primária (GORM)                           |
+| `Numero`          | `string`      | Número da NF-e                                  |
+| `ClienteID`       | `uint`        | Chave estrangeira (Cliente.ID)                   |
+| `Items`           | `[]ItemNotaFiscal` | Array de itens da nota fiscal                     |
+| `ValorTotal`      | `float64`     | Valor total da nota fiscal                       |
+| `FormaPagamentoID` | `uint`        | Chave estrangeira (FormaPagamento.ID)           |
+| `Desconto`        | `float64`     | Valor do desconto aplicado                        |
+| `Observacao`      | `string`      | Observações adicionais                           |
+| `ChaveAcesso`     | `string`      | Chave de acesso da NF-e (após autorização)      |
+
+
+**9. `FormaPagamento` (Formas de Pagamento)**
+
+| Campo             | Tipo de Dado | Descrição                                      |
+|--------------------|---------------|--------------------------------------------------|
+| `ID`              | `uint`        | Chave primária                                   |
+| `Nome`            | `string`      | Nome da forma de pagamento (ex: Dinheiro, Cartão) |
+
+
+Este é um resumo. Uma NF-e real contém muitos mais detalhes e campos específicos dependendo da legislação e do tipo de operação. 

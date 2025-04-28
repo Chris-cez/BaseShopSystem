@@ -17,7 +17,7 @@ type Repository struct {
 func main() {
 	err := godotenv.Load(".env")
 	if err != nil {
-		log.Fatal("Error loading .env file\n", err)
+		log.Fatal("Erro no loading do .env file\n", err)
 	}
 
 	config := &storage.Config{

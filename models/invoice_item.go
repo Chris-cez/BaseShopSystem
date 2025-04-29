@@ -6,7 +6,6 @@ import (
 
 type InvoiceItem struct {
 	gorm.Model
-	InvoiceID  uint    `json:"invoice_id"`
 	ProductID  uint    `json:"product_id"`
 	Product    Product `gorm:"foreignKey:ProductID"`
 	Quantity   int     `json:"quantity"`

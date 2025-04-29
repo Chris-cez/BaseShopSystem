@@ -102,3 +102,12 @@ func (r *CompanyRepository) UpdateCompany(c *fiber.Ctx) error {
 			"data": company})
 	return nil
 }
+func (r *CompanyRepository) SetupCompanyRoutes(app *fiber.App) {
+	api := app.Group("/api")
+	company := api.Group("/company")
+
+	company.Post("/", r.CreateCompany)
+	company.Get("/", r.GetCompanies)
+	company.Get("/:id", r.GetCompanyByID)
+	company.Put("/:id", r.UpdateCompany)
+}

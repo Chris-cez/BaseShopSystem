@@ -1,10 +1,12 @@
 package routes
 
 import (
+	"net/http"
+
 	"github.com/Chris-cez/BaseShopSystem/models"
 	"github.com/gofiber/fiber/v2"
+	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
-	"net/http"
 )
 
 type CompanyRepository struct {
@@ -20,6 +22,16 @@ func (r *CompanyRepository) CreateCompany(c *fiber.Ctx) error {
 			&fiber.Map{"message": "Request failed"})
 		return err
 	}
+
+	// Gerar o hash da senha
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(company.Password), bcrypt.DefaultCost)
+	if err != nil {
+		c.Status(http.StatusInternalServerError).JSON(
+			&fiber.Map{"message": "Could not hash password"})
+		return err
+	}
+	company.Password = string(hashedPassword)
+
 	err = r.DB.Create(&company).Error
 	if err != nil {
 		c.Status(http.StatusBadRequest).JSON(
@@ -102,12 +114,56 @@ func (r *CompanyRepository) UpdateCompany(c *fiber.Ctx) error {
 			"data": company})
 	return nil
 }
+
+func (r *CompanyRepository) AuthenticateCompany(c *fiber.Ctx) error {
+	type AuthRequest struct {
+		CNPJ     string `json:"cnpj"`
+		Password string `json:"password"`
+	}
+
+	var authRequest AuthRequest
+	if err := c.BodyParser(&authRequest); err != nil {
+		c.Status(http.StatusBadRequest).JSON(
+			&fiber.Map{"message": "Invalid request body"})
+		return err
+	}
+
+	// Buscar a empresa pelo CNPJ
+	company := models.Company{}
+	err := r.DB.Where("cnpj = ?", authRequest.CNPJ).First(&company).Error
+	if err != nil {
+		c.Status(http.StatusUnauthorized).JSON(
+			&fiber.Map{"message": "Invalid CNPJ or password"})
+		return err
+	}
+
+	// Verificar a senha (comparar o hash)
+	err = bcrypt.CompareHashAndPassword([]byte(company.Password), []byte(authRequest.Password))
+	if err != nil {
+		c.Status(http.StatusUnauthorized).JSON(
+			&fiber.Map{"message": "Invalid CNPJ or password"})
+		return nil
+	}
+
+	// Gerar o token JWT
+	token, err := GenerateJWT(company.CNPJ)
+	if err != nil {
+		c.Status(http.StatusInternalServerError).JSON(
+			&fiber.Map{"message": "Could not generate token"})
+		return err
+	}
+
+	c.Status(http.StatusOK).JSON(
+		&fiber.Map{"message": "Authentication successful", "token": token})
+	return nil
+}
+
 func (r *CompanyRepository) SetupCompanyRoutes(app *fiber.App) {
 	api := app.Group("/api")
-	company := api.Group("/company")
 
-	company.Post("/", r.CreateCompany)
-	company.Get("/", r.GetCompanies)
-	company.Get("/:id", r.GetCompanyByID)
-	company.Put("/:id", r.UpdateCompany)
+	api.Post("/company", r.CreateCompany)
+	api.Get("/company", r.GetCompanies)
+	api.Get("/company/:id", r.GetCompanyByID)
+	api.Put("/company/:id", r.UpdateCompany)
+	api.Post("/entrar", r.AuthenticateCompany) // Nova rota de autenticação
 }

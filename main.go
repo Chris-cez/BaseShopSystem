@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/Chris-cez/BaseShopSystem/routes"
 	"github.com/Chris-cez/BaseShopSystem/storage"
 	"github.com/gofiber/fiber/v2"
 	"github.com/joho/godotenv"
@@ -40,5 +41,8 @@ func main() {
 	}
 
 	app := fiber.New()
+
+	routes.SetupRoutes(app, db)
+
 	log.Fatal(app.Listen(":8080"))
 }

@@ -11,6 +11,7 @@ type Repository struct {
 
 func SetupRoutes(app *fiber.App, db *gorm.DB) {
 	productRepo := ProductRepository{DB: db}
+	companyRepo := CompanyRepository{DB: db}
 	addressRepo := AddressRepository{DB: db}
 	classRepo := ClassRepository{DB: db}
 	clientRepo := ClientRepository{DB: db}
@@ -22,6 +23,7 @@ func SetupRoutes(app *fiber.App, db *gorm.DB) {
 	productRepo.SetupProductRoutes(app)
 	addressRepo.SetupAddressRoutes(app)
 	classRepo.SetupClassRoutes(app)
+	companyRepo.SetupCompanyRoutes(app)
 	clientRepo.SetupClientRoutes(app)
 	invoiceItemRepo.SetupInvoiceItemRoutes(app)
 	invoiceRepo.SetupInvoiceRoutes(app)

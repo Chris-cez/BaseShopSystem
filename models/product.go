@@ -11,7 +11,6 @@ type Product struct {
 	UM          string  `json:"um"`
 	Description string  `json:"description"`
 	ClassID     uint    `json:"class_id"`
-	Class       Class   `gorm:"foreignKey:ClassID"`
 	Stock       int     `json:"stock"`
 }
 

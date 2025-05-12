@@ -4,10 +4,9 @@ import "gorm.io/gorm"
 
 type Class struct {
 	gorm.Model
-	Name        string       `json:"name"`
-	Description string       `json:"description"`
-	NCM         string       `json:"ncm"`
-	Tributacoes []Tributacao `json:"tributacoes" gorm:"foreignKey:ClassID"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	NCM         string `json:"ncm"`
 }
 
 func MigrateClass(db *gorm.DB) error {

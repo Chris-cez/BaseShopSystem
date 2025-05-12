@@ -7,6 +7,7 @@ type Tributacao struct {
 	Nome        string  `json:"nome"`
 	Aliquota    float64 `json:"aliquota"`
 	TipoTributo string  `json:"tipo_tributo"`
+	ClassID     uint    `json:"class_id"`
 }
 
 func MigrateTributacao(db *gorm.DB) error {

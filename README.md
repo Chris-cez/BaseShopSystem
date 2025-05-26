@@ -56,6 +56,7 @@ A estrutura é baseada em múltiplas tabelas relacionadas para garantir a integr
 | Campo             | Tipo de Dado  | Descrição                                      |
 |-------------------|---------------|------------------------------------------------|
 | `ID`              | `uint`        | Chave primária                                 |
+| `GTIN`            | `string`      | GTIN do produto                                |
 | `Nome`            | `string`      | Nome do produto                                |
 | `Descricao`       | `string`      | Descrição do produto                           |
 | `ClasseProdutoID` | `uint`        | Chave estrangeira (ClasseProduto.ID)           |
@@ -94,7 +95,6 @@ A estrutura é baseada em múltiplas tabelas relacionadas para garantir a integr
 | `ID`              | `gorm.Model`  | Chave primária (GORM)                           |
 | `Numero`          | `string`      | Número da NF-e                                  |
 | `ClienteID`       | `uint`        | Chave estrangeira (Cliente.ID)                  |
-| `Items`           | `[]ItemNotaFiscal` | Array de itens da nota fiscal              |
 | `ValorTotal`      | `float64`     | Valor total da nota fiscal                      |
 | `FormaPagamentoID`| `uint`        | Chave estrangeira (FormaPagamento.ID)           |
 | `Desconto`        | `float64`     | Valor do desconto aplicado                      |

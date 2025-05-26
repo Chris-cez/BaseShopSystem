@@ -18,7 +18,6 @@ func SetupRoutes(app *fiber.App, db *gorm.DB) {
 	invoiceItemRepo := InvoiceItemRepository{DB: db}
 	invoiceRepo := InvoiceRepository{DB: db}
 	paymentMethodRepo := PaymentMethodRepository{DB: db}
-	tributacaoRepo := TributacaoRepository{DB: db}
 
 	productRepo.SetupProductRoutes(app)
 	addressRepo.SetupAddressRoutes(app)
@@ -28,5 +27,4 @@ func SetupRoutes(app *fiber.App, db *gorm.DB) {
 	invoiceItemRepo.SetupInvoiceItemRoutes(app)
 	invoiceRepo.SetupInvoiceRoutes(app)
 	paymentMethodRepo.SetupPaymentMethodRoutes(app)
-	tributacaoRepo.SetupTributacaoRoutes(app)
 }

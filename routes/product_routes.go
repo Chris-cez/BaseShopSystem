@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/Chris-cez/BaseShopSystem/middleware"
 	"github.com/Chris-cez/BaseShopSystem/models"
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
@@ -169,7 +170,7 @@ func (r *ProductRepository) DeleteProduct(c *fiber.Ctx) error {
 }
 
 func (r *ProductRepository) SetupProductRoutes(app *fiber.App) {
-	api := app.Group("/api")
+	api := app.Group("/api", middleware.AuthRequired) // Adiciona o middleware aqui
 	api.Post("/products", r.CreateProduct)
 	api.Get("/products", r.GetProducts)
 	api.Get("/products/:id", r.GetProductByID)

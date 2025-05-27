@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/Chris-cez/BaseShopSystem/middleware"
 	"github.com/Chris-cez/BaseShopSystem/models"
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
@@ -139,12 +140,42 @@ func (r *ProductRepository) UpdateProduct(c *fiber.Ctx) error {
 	return nil
 }
 
+func (r *ProductRepository) DeleteProduct(c *fiber.Ctx) error {
+	id := c.Params("id")
+	product := models.Product{}
+
+	if id == "" {
+		c.Status(http.StatusInternalServerError).JSON(
+			&fiber.Map{"message": "id can not be empty"})
+		return nil
+	}
+
+	err := r.DB.Where("id = ?", id).First(&product).Error
+	if err != nil {
+		c.Status(http.StatusBadRequest).JSON(
+			&fiber.Map{"message": "product not found"})
+		return err
+	}
+
+	err = r.DB.Delete(&product).Error
+	if err != nil {
+		c.Status(http.StatusBadRequest).JSON(
+			&fiber.Map{"message": "could not delete product"})
+		return err
+	}
+
+	c.Status(http.StatusOK).JSON(
+		&fiber.Map{"message": "product deleted successfully"})
+	return nil
+}
+
 func (r *ProductRepository) SetupProductRoutes(app *fiber.App) {
-	api := app.Group("/api")
+	api := app.Group("/api", middleware.AuthRequired) // Adiciona o middleware aqui
 	api.Post("/products", r.CreateProduct)
 	api.Get("/products", r.GetProducts)
 	api.Get("/products/:id", r.GetProductByID)
 	api.Get("/products/name/:name", r.GetProductsByName)
 	api.Get("/products/class/:class_id", r.GetProductsByClass)
 	api.Put("/products/:id", r.UpdateProduct)
+	api.Delete("/products/:id", r.DeleteProduct)
 }

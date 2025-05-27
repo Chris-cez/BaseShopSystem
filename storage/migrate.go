@@ -47,10 +47,5 @@ func MigrateModels(db *gorm.DB) error {
 		log.Fatal("Error migrating invoice item model\n", err)
 	}
 
-	err = models.MigrateTributacao(db)
-	if err != nil {
-		log.Fatal("Error migrating tributacao model\n", err)
-	}
-
 	return nil
 }

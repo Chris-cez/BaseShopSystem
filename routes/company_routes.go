@@ -3,6 +3,7 @@ package routes
 import (
 	"net/http"
 
+	"github.com/Chris-cez/BaseShopSystem/middleware"
 	"github.com/Chris-cez/BaseShopSystem/models"
 	"github.com/gofiber/fiber/v2"
 	"golang.org/x/crypto/bcrypt"
@@ -146,7 +147,7 @@ func (r *CompanyRepository) AuthenticateCompany(c *fiber.Ctx) error {
 	}
 
 	// Gerar o token JWT
-	token, err := GenerateJWT(company.CNPJ)
+	token, err := middleware.GenerateJWT(company.CNPJ)
 	if err != nil {
 		c.Status(http.StatusInternalServerError).JSON(
 			&fiber.Map{"message": "Could not generate token"})

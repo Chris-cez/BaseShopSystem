@@ -1,12 +1,18 @@
 package models
 
-import "gorm.io/gorm"
+import (
+	"time"
+
+	"gorm.io/gorm"
+)
 
 type PaymentMethod struct {
-    gorm.Model
-    Name string `json:"name"`
+	ID        uint      `gorm:"primaryKey" json:"id"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+	Name      string    `json:"name"`
 }
 
 func MigratePaymentMethod(db *gorm.DB) error {
-    return db.AutoMigrate(&PaymentMethod{})
+	return db.AutoMigrate(&PaymentMethod{})
 }

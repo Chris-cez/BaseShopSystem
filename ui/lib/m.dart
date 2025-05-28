@@ -13,6 +13,7 @@ final List<String> pageNames = ['Início', 'Produtos', 'Vendas', 'Clientes'];
 class _MWS extends State<MW> {
   int pageIndex = 0;
 
+  final List<String> produtos = [];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -103,12 +104,28 @@ class _MWS extends State<MW> {
 
   Widget _buildContent(BuildContext context) {
     if (pageIndex == 1) {
-      return Text('Produtos');
+      return _buildProductList();
     } else if (pageIndex == 2) {
       return Text('Vendas');
     } else if (pageIndex == 3) {
       return Text('Clientes');
     }
     return Text('Página inicial');
+  }
+
+  Widget _buildProductList() {
+    if (produtos.isEmpty) {
+      return Center(child: Text('Nenhum produto disponível.'));
+    }
+    return ListView.builder(
+      itemCount: produtos.length,
+      itemBuilder: (context, index) {
+        final produto = produtos[index];
+        return ListTile(
+          title: Text(produto),
+          onTap: () {},
+        );
+      },
+    );
   }
 }

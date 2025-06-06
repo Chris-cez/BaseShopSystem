@@ -48,7 +48,6 @@ A estrutura é baseada em múltiplas tabelas relacionadas para garantir a integr
 | `Nome`            | `string`       | Nome da classe do produto                          |
 | `Descricao`       | `string`       | Descrição da classe do produto                     |
 | `NCM`             | `string`       | Código NCM da classe do produto                    |
-| `Tributacoes`     | `[]Tributacao` | Array de tributações aplicadas à classe do produto |
 
 
 **5. `Produto` (Dados do Produto)**
@@ -60,23 +59,13 @@ A estrutura é baseada em múltiplas tabelas relacionadas para garantir a integr
 | `Nome`            | `string`      | Nome do produto                                |
 | `Descricao`       | `string`      | Descrição do produto                           |
 | `ClasseProdutoID` | `uint`        | Chave estrangeira (ClasseProduto.ID)           |
-| `ValorUnitario`   | `float64`     | Valor unitário do produto                      |
+| `ValorUnitario`   | `float32`     | Valor unitário do produto                      |
 | `Unidade`         | `string`      | Unidade de medida (ex: UN, KG, M)              |
 | `Estoque`         | `int`         | Quantidade em estoque                          |
+| `valorTributos`   | `float32`     | Valor total dos tributos do produto            |
 
 
-**6. `Tributacao` (Dados de Tributação)**
-
-| Campo             | Tipo de Dado | Descrição                                      |
-|-------------------|--------------|------------------------------------------------|
-| `ID`              | `uint`       | Chave primária                                 |
-| `Nome`            | `string`     | Nome do tributo (ex: ICMS, IPI, PIS, COFINS)   |
-| `Aliquota`        | `float64`    | Alíquota do tributo                            |
-| `TipoTributo`     | `string`     | Tipo de tributo                                |
-
-
-
-**7. `ItemNotaFiscal` (Itens da Nota Fiscal)**
+**6. `ItemNotaFiscal` (Itens da Nota Fiscal)**
 
 | Campo             | Tipo de Dado  | Descrição                                        |
 |-------------------|---------------|--------------------------------------------------|
@@ -88,7 +77,7 @@ A estrutura é baseada em múltiplas tabelas relacionadas para garantir a integr
 | `ValorTotal`      | `float64`     | Valor total do item (Quantidade * ValorUnitario) |
 
 
-**8. `NotaFiscal` (Dados da Nota Fiscal)**
+**7. `NotaFiscal` (Dados da Nota Fiscal)**
 
 | Campo             | Tipo de Dado  | Descrição                                       |
 |-------------------|---------------|-------------------------------------------------|
@@ -102,7 +91,7 @@ A estrutura é baseada em múltiplas tabelas relacionadas para garantir a integr
 | `ChaveAcesso`     | `string`      | Chave de acesso da NF-e (após autorização)      |
 
 
-**9. `FormaPagamento` (Formas de Pagamento)**
+**8. `FormaPagamento` (Formas de Pagamento)**
 
 | Campo             | Tipo de Dado | Descrição                                         |
 |-------------------|--------------|---------------------------------------------------|

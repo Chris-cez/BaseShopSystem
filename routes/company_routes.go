@@ -160,11 +160,11 @@ func (r *CompanyRepository) AuthenticateCompany(c *fiber.Ctx) error {
 }
 
 func (r *CompanyRepository) SetupCompanyRoutes(app *fiber.App) {
-	api := app.Group("/api")
+	api := app.Group("/api", middleware.AuthRequired)
 
 	api.Post("/company", r.CreateCompany)
 	api.Get("/company", r.GetCompanies)
 	api.Get("/company/:id", r.GetCompanyByID)
 	api.Put("/company/:id", r.UpdateCompany)
-	api.Post("/entrar", r.AuthenticateCompany) // Nova rota de autenticação
+	app.Post("/entrar", r.AuthenticateCompany)
 }

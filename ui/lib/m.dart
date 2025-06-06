@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:login_bss/p.dart';
 import 'g.dart';
 
 class MW extends StatefulWidget {
@@ -103,7 +104,7 @@ class _MWS extends State<MW> {
 
   Widget _buildContent(BuildContext context) {
     if (pageIndex == 1) {
-      return Text('Produtos');
+      return PLW();
     } else if (pageIndex == 2) {
       return Text('Vendas');
     } else if (pageIndex == 3) {

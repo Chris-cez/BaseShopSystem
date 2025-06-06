@@ -3,6 +3,7 @@ package routes
 import (
 	"net/http"
 
+	"github.com/Chris-cez/BaseShopSystem/middleware"
 	"github.com/Chris-cez/BaseShopSystem/models"
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
@@ -106,7 +107,7 @@ func (r *AddressRepository) UpdateAddress(c *fiber.Ctx) error {
 }
 
 func (r *AddressRepository) SetupAddressRoutes(app *fiber.App) {
-	api := app.Group("/api")
+	api := app.Group("/api", middleware.AuthRequired)
 	api.Post("/addresses", r.CreateAddress)
 	api.Get("/addresses", r.GetAddresses)
 	api.Get("/addresses/:id", r.GetAddressByID)

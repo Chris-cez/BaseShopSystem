@@ -3,6 +3,7 @@ package routes
 import (
 	"net/http"
 
+	"github.com/Chris-cez/BaseShopSystem/middleware"
 	"github.com/Chris-cez/BaseShopSystem/models"
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
@@ -106,7 +107,7 @@ func (r *ClassRepository) UpdateClass(c *fiber.Ctx) error {
 }
 
 func (r *ClassRepository) SetupClassRoutes(app *fiber.App) {
-	api := app.Group("/api")
+	api := app.Group("/api", middleware.AuthRequired)
 	api.Post("/classes", r.CreateClass)
 	api.Get("/classes", r.GetClasses)
 	api.Get("/classes/:id", r.GetClassByID)

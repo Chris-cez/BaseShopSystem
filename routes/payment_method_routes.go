@@ -3,6 +3,7 @@ package routes
 import (
 	"net/http"
 
+	"github.com/Chris-cez/BaseShopSystem/middleware"
 	"github.com/Chris-cez/BaseShopSystem/models"
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
@@ -99,7 +100,7 @@ func (r *PaymentMethodRepository) DeletePaymentMethod(c *fiber.Ctx) error {
 }
 
 func (r *PaymentMethodRepository) SetupPaymentMethodRoutes(app *fiber.App) {
-	api := app.Group("/api")
+	api := app.Group("/api", middleware.AuthRequired)
 	api.Post("/payment_methods", r.CreatePaymentMethod)
 	api.Get("/payment_methods", r.GetPaymentMethods)
 	api.Get("/payment_methods/:id", r.GetPaymentMethodByID)

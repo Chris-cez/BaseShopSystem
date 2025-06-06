@@ -3,6 +3,7 @@ package routes
 import (
 	"net/http"
 
+	"github.com/Chris-cez/BaseShopSystem/middleware"
 	"github.com/Chris-cez/BaseShopSystem/models"
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
@@ -106,7 +107,7 @@ func (r *InvoiceItemRepository) UpdateInvoiceItem(c *fiber.Ctx) error {
 }
 
 func (r *InvoiceItemRepository) SetupInvoiceItemRoutes(app *fiber.App) {
-	api := app.Group("/api")
+	api := app.Group("/api", middleware.AuthRequired)
 	api.Post("/invoice_items", r.CreateInvoiceItem)
 	api.Get("/invoice_items", r.GetInvoiceItems)
 	api.Get("/invoice_items/:id", r.GetInvoiceItemByID)

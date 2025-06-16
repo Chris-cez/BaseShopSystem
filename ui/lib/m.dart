@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:login_bss/p.dart';
+import 'package:login_bss/crud_template.dart';
+import 'package:login_bss/prod.dart';
 import 'g.dart';
 
 class MW extends StatefulWidget {
@@ -18,12 +19,12 @@ class _MWS extends State<MW> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: DecoratedBox(
-        decoration: BoxDecoration(
-          gradient: gradient,
-        ),
+        decoration: BoxDecoration(gradient: gradient),
         child: Padding(
           padding: EdgeInsets.all(defaultSpacing),
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(children: [Spacer()]),
               Container(
@@ -49,7 +50,9 @@ class _MWS extends State<MW> {
                       child: ElevatedButton(
                         style: redButtonStyle,
                         onPressed: () async {
-                          Navigator.of(context).pushNamedAndRemoveUntil('/x', (route) => false);
+                          Navigator.of(
+                            context,
+                          ).pushNamedAndRemoveUntil('/x', (route) => false);
                         },
                         child: const Text('Sair'),
                       ),
@@ -74,7 +77,6 @@ class _MWS extends State<MW> {
               space,
               Expanded(
                 child: Container(
-                  padding: EdgeInsets.all(defaultSpacing),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(16),
@@ -90,7 +92,7 @@ class _MWS extends State<MW> {
                   child: Column(
                     children: [
                       Row(children: [Spacer()]),
-                      _buildContent(context),
+                      Expanded(child: _buildContent(context)),
                     ],
                   ),
                 ),
@@ -104,7 +106,7 @@ class _MWS extends State<MW> {
 
   Widget _buildContent(BuildContext context) {
     if (pageIndex == 1) {
-      return PLW();
+      return T<P$, Pb>((context) => Pb(P$()));
     } else if (pageIndex == 2) {
       return Text('Vendas');
     } else if (pageIndex == 3) {

@@ -17,9 +17,7 @@ class ECx extends EC {
         '/entrar',
         data: {'cnpj': pj.replaceAll('/', '').replaceAll('.', '').replaceAll('-', ''), 'password': psw},
       );
-      print(response.data);
       if ((response.statusCode ?? 200) < 300) {
-        print(response.data);
         key.value = response.data['token'];
         //key.expiration = DateTime.now().add(const Duration(days: 1));
         await key.store;
@@ -31,6 +29,7 @@ class ECx extends EC {
     return false;
   }
 }
+
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});

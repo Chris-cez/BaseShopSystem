@@ -105,16 +105,16 @@ func (r *ProductRepository) GetProductsByClass(c *fiber.Ctx) error {
 }
 
 func (r *ProductRepository) UpdateProduct(c *fiber.Ctx) error {
-	id := c.Params("id")
+	code := c.Params("code")
 	product := models.Product{}
 
-	if id == "" {
+	if code == "" {
 		c.Status(http.StatusInternalServerError).JSON(
-			&fiber.Map{"message": "id can not be empty"})
+			&fiber.Map{"message": "code can not be empty"})
 		return nil
 	}
 
-	err := r.DB.Where("id = ?", id).First(&product).Error
+	err := r.DB.Where("code = ?", code).First(&product).Error
 	if err != nil {
 		c.Status(http.StatusBadRequest).JSON(
 			&fiber.Map{"message": "product not found"})
@@ -141,16 +141,16 @@ func (r *ProductRepository) UpdateProduct(c *fiber.Ctx) error {
 }
 
 func (r *ProductRepository) DeleteProduct(c *fiber.Ctx) error {
-	id := c.Params("id")
+	code := c.Params("code")
 	product := models.Product{}
 
-	if id == "" {
+	if code == "" {
 		c.Status(http.StatusInternalServerError).JSON(
-			&fiber.Map{"message": "id can not be empty"})
+			&fiber.Map{"message": "code can not be empty"})
 		return nil
 	}
 
-	err := r.DB.Where("id = ?", id).First(&product).Error
+	err := r.DB.Where("code = ?", code).First(&product).Error
 	if err != nil {
 		c.Status(http.StatusBadRequest).JSON(
 			&fiber.Map{"message": "product not found"})
@@ -176,6 +176,6 @@ func (r *ProductRepository) SetupProductRoutes(app *fiber.App) {
 	api.Get("/products/:id", r.GetProductByID)
 	api.Get("/products/name/:name", r.GetProductsByName)
 	api.Get("/products/class/:class_id", r.GetProductsByClass)
-	api.Put("/products/:id", r.UpdateProduct)
-	api.Delete("/products/:id", r.DeleteProduct)
+	api.Put("/products/:code", r.UpdateProduct)    // Alterado para code
+	api.Delete("/products/:code", r.DeleteProduct) // Alterado para code
 }

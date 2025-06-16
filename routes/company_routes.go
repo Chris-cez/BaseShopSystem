@@ -81,17 +81,39 @@ func (r *CompanyRepository) GetCompanyByID(c *fiber.Ctx) error {
 	return nil
 }
 
-func (r *CompanyRepository) UpdateCompany(c *fiber.Ctx) error {
-	id := c.Params("id")
-	company := models.Company{}
+func (r *CompanyRepository) GetCompanyByCNPJ(c *fiber.Ctx) error {
+	cnpj := c.Params("cnpj")
+	companyModel := models.Company{}
 
-	if id == "" {
+	if cnpj == "" {
 		c.Status(http.StatusInternalServerError).JSON(
-			&fiber.Map{"message": "id can not be empty"})
+			&fiber.Map{"message": "cnpj can not be empty"})
 		return nil
 	}
 
-	err := r.DB.Where("id = ?", id).First(&company).Error
+	err := r.DB.Where("cnpj = ?", cnpj).First(&companyModel).Error
+	if err != nil {
+		c.Status(http.StatusBadRequest).JSON(
+			&fiber.Map{"message": "could not get company"})
+		return err
+	}
+	c.Status(http.StatusOK).JSON(
+		&fiber.Map{"message": "company fetched successfully",
+			"data": companyModel})
+	return nil
+}
+
+func (r *CompanyRepository) UpdateCompany(c *fiber.Ctx) error {
+	cnpj := c.Params("cnpj")
+	company := models.Company{}
+
+	if cnpj == "" {
+		c.Status(http.StatusInternalServerError).JSON(
+			&fiber.Map{"message": "cnpj can not be empty"})
+		return nil
+	}
+
+	err := r.DB.Where("cnpj = ?", cnpj).First(&company).Error
 	if err != nil {
 		c.Status(http.StatusBadRequest).JSON(
 			&fiber.Map{"message": "could not get company"})
@@ -164,7 +186,7 @@ func (r *CompanyRepository) SetupCompanyRoutes(app *fiber.App) {
 
 	api.Post("/company", r.CreateCompany)
 	api.Get("/company", r.GetCompanies)
-	api.Get("/company/:id", r.GetCompanyByID)
-	api.Put("/company/:id", r.UpdateCompany)
+	api.Get("/company/:cnpj", r.GetCompanyByCNPJ) // Alterado para cnpj
+	api.Put("/company/:cnpj", r.UpdateCompany)    // Alterado para cnpj
 	app.Post("/entrar", r.AuthenticateCompany)
 }

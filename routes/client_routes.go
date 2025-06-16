@@ -70,17 +70,39 @@ func (r *ClientRepository) GetClientByID(c *fiber.Ctx) error {
 	return nil
 }
 
-func (r *ClientRepository) UpdateClient(c *fiber.Ctx) error {
-	id := c.Params("id")
-	client := models.Client{}
+func (r *ClientRepository) GetClientByCPF(c *fiber.Ctx) error {
+	cpf := c.Params("cpf")
+	clientModel := models.Client{}
 
-	if id == "" {
+	if cpf == "" {
 		c.Status(http.StatusInternalServerError).JSON(
-			&fiber.Map{"message": "id can not be empty"})
+			&fiber.Map{"message": "cpf can not be empty"})
 		return nil
 	}
 
-	err := r.DB.Where("id = ?", id).First(&client).Error
+	err := r.DB.Where("cpf = ?", cpf).First(&clientModel).Error
+	if err != nil {
+		c.Status(http.StatusBadRequest).JSON(
+			&fiber.Map{"message": "could not get the client"})
+		return err
+	}
+	c.Status(http.StatusOK).JSON(
+		&fiber.Map{"message": "client fetched successfully",
+			"data": clientModel})
+	return nil
+}
+
+func (r *ClientRepository) UpdateClient(c *fiber.Ctx) error {
+	cpf := c.Params("cpf")
+	client := models.Client{}
+
+	if cpf == "" {
+		c.Status(http.StatusInternalServerError).JSON(
+			&fiber.Map{"message": "cpf can not be empty"})
+		return nil
+	}
+
+	err := r.DB.Where("cpf = ?", cpf).First(&client).Error
 	if err != nil {
 		c.Status(http.StatusBadRequest).JSON(
 			&fiber.Map{"message": "client not found"})
@@ -107,16 +129,16 @@ func (r *ClientRepository) UpdateClient(c *fiber.Ctx) error {
 }
 
 func (r *ClientRepository) DeleteClient(c *fiber.Ctx) error {
-	id := c.Params("id")
+	cpf := c.Params("cpf")
 	client := models.Client{}
 
-	if id == "" {
+	if cpf == "" {
 		c.Status(http.StatusInternalServerError).JSON(
-			&fiber.Map{"message": "id can not be empty"})
+			&fiber.Map{"message": "cpf can not be empty"})
 		return nil
 	}
 
-	err := r.DB.Where("id = ?", id).First(&client).Error
+	err := r.DB.Where("cpf = ?", cpf).First(&client).Error
 	if err != nil {
 		c.Status(http.StatusBadRequest).JSON(
 			&fiber.Map{"message": "client not found"})
@@ -139,7 +161,7 @@ func (r *ClientRepository) SetupClientRoutes(app *fiber.App) {
 	api := app.Group("/api", middleware.AuthRequired)
 	api.Post("/clients", r.CreateClient)
 	api.Get("/clients", r.GetClients)
-	api.Get("/clients/:id", r.GetClientByID)
-	api.Put("/clients/:id", r.UpdateClient)
-	api.Delete("/clients/:id", r.DeleteClient)
+	api.Get("/clients/:cpf", r.GetClientByCPF)  // Alterado para cpf
+	api.Put("/clients/:cpf", r.UpdateClient)    // Alterado para cpf
+	api.Delete("/clients/:cpf", r.DeleteClient) // Alterado para cpf
 }

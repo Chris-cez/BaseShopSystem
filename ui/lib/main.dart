@@ -14,11 +14,11 @@ class ECx extends EC {
   Future<bool> login(String pj, String psw) async {
     try {
       Response response = await api.post(
-        '/api/entrar',
-        data: {'cnpj': pj, 'password': psw},
+        '/entrar',
+        data: {'cnpj': pj.replaceAll('/', '').replaceAll('.', '').replaceAll('-', ''), 'password': psw},
       );
-      if (response.statusCode == 200) {
-        key.value = response.data['key'];
+      if ((response.statusCode ?? 200) < 300) {
+        key.value = response.data['token'];
         //key.expiration = DateTime.now().add(const Duration(days: 1));
         await key.store;
         return true;
@@ -29,6 +29,7 @@ class ECx extends EC {
     return false;
   }
 }
+
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});

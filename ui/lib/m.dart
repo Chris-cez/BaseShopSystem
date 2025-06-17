@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:login_bss/crud_template.dart';
+import 'package:login_bss/prod.dart';
 import 'g.dart';
-import 'package:login_bss/p.dart';
 
 class MW extends StatefulWidget {
   const MW({super.key});
@@ -14,7 +15,6 @@ final List<String> pageNames = ['Início', 'Produtos', 'Vendas', 'Clientes'];
 class _MWS extends State<MW> {
   int pageIndex = 0;
 
-  final List<String> produtos = [];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -23,6 +23,8 @@ class _MWS extends State<MW> {
         child: Padding(
           padding: EdgeInsets.all(defaultSpacing),
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(children: [Spacer()]),
               Container(
@@ -75,7 +77,6 @@ class _MWS extends State<MW> {
               space,
               Expanded(
                 child: Container(
-                  padding: EdgeInsets.all(defaultSpacing),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(16),
@@ -91,7 +92,7 @@ class _MWS extends State<MW> {
                   child: Column(
                     children: [
                       Row(children: [Spacer()]),
-                      _buildContent(context),
+                      Expanded(child: _buildContent(context)),
                     ],
                   ),
                 ),
@@ -105,7 +106,7 @@ class _MWS extends State<MW> {
 
   Widget _buildContent(BuildContext context) {
     if (pageIndex == 1) {
-      return const PW();
+      return T<P$, Pb>((context) => Pb(P$()));
     } else if (pageIndex == 2) {
       return Text('Vendas');
     } else if (pageIndex == 3) {

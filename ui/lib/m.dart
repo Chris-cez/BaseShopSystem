@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'g.dart';
+import 'package:login_bss/p.dart';
 
 class MW extends StatefulWidget {
   const MW({super.key});
@@ -18,9 +19,7 @@ class _MWS extends State<MW> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: DecoratedBox(
-        decoration: BoxDecoration(
-          gradient: gradient,
-        ),
+        decoration: BoxDecoration(gradient: gradient),
         child: Padding(
           padding: EdgeInsets.all(defaultSpacing),
           child: Column(
@@ -49,7 +48,9 @@ class _MWS extends State<MW> {
                       child: ElevatedButton(
                         style: redButtonStyle,
                         onPressed: () async {
-                          Navigator.of(context).pushNamedAndRemoveUntil('/x', (route) => false);
+                          Navigator.of(
+                            context,
+                          ).pushNamedAndRemoveUntil('/x', (route) => false);
                         },
                         child: const Text('Sair'),
                       ),
@@ -104,28 +105,12 @@ class _MWS extends State<MW> {
 
   Widget _buildContent(BuildContext context) {
     if (pageIndex == 1) {
-      return _buildProductList();
+      return const PW();
     } else if (pageIndex == 2) {
       return Text('Vendas');
     } else if (pageIndex == 3) {
       return Text('Clientes');
     }
     return Text('Página inicial');
-  }
-
-  Widget _buildProductList() {
-    if (produtos.isEmpty) {
-      return Center(child: Text('Nenhum produto disponível.'));
-    }
-    return ListView.builder(
-      itemCount: produtos.length,
-      itemBuilder: (context, index) {
-        final produto = produtos[index];
-        return ListTile(
-          title: Text(produto),
-          onTap: () {},
-        );
-      },
-    );
   }
 }

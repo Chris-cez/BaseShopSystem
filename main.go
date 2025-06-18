@@ -47,45 +47,6 @@ func insertTestData(db *gorm.DB) error {
 		if err := db.Create(&company).Error; err != nil {
 			return err
 		}
-		class := models.Class{
-			Name:        "Classe Teste",
-			Description: "Descrição da classe de teste",
-			NCM:         "12345678",
-		}
-
-		if err := db.Create(&class).Error; err != nil {
-			return err
-		}
-
-		// Cria 2 produtos de teste
-		products := []models.Product{
-			{
-				Code:        "PROD001",
-				Price:       10.50,
-				Name:        "Produto 1",
-				GTIN:        "7891234567890",
-				UM:          "UN",
-				Description: "Primeiro produto de teste",
-				ClassID:     uint(class.ID),
-				Stock:       100,
-				ValTrib:     1.50,
-			},
-			{
-				Code:        "PROD002",
-				Price:       20.75,
-				Name:        "Produto 2",
-				GTIN:        "7891234567891",
-				UM:          "UN",
-				Description: "Segundo produto de teste",
-				ClassID:     uint(class.ID),
-				Stock:       50,
-				ValTrib:     2.00,
-			},
-		}
-		if err := db.Create(&products).Error; err != nil {
-			return err
-		}
-
 	}
 	return nil
 }

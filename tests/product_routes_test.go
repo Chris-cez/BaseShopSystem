@@ -8,7 +8,6 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/Chris-cez/BaseShopSystem/middleware"
 	"github.com/Chris-cez/BaseShopSystem/models"
 	"github.com/Chris-cez/BaseShopSystem/routes"
 	"github.com/gofiber/fiber/v2"
@@ -16,15 +15,13 @@ import (
 	"gorm.io/gorm"
 )
 
-func setupTestApp() (*fiber.App, *gorm.DB, string) {
+func setupTestApp() (*fiber.App, *gorm.DB) {
 	app := fiber.New()
 	db, _ := gorm.Open(sqlite.Open(":memory:"), &gorm.Config{})
 	models.MigrateProduct(db)
 	repo := routes.ProductRepository{DB: db}
 	repo.SetupProductRoutes(app)
-	// Gera um token válido (pode usar qualquer CNPJ fictício)
-	token, _ := middleware.GenerateJWT("12345678000199")
-	return app, db, token
+	return app, db
 }
 
 func createProduct(app *fiber.App, t *testing.T, db *gorm.DB) uint {
@@ -49,7 +46,7 @@ func createProduct(app *fiber.App, t *testing.T, db *gorm.DB) uint {
 }
 
 func TestCreateProduct(t *testing.T) {
-	app, db, token := setupTestApp()
+	app, db := setupTestApp()
 	product := models.Product{
 		Code:  "002",
 		Price: 20.0,
@@ -58,7 +55,6 @@ func TestCreateProduct(t *testing.T) {
 	body, _ := json.Marshal(product)
 	req := httptest.NewRequest("POST", "/api/products", bytes.NewReader(body))
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "Bearer "+token)
 	resp, err := app.Test(req)
 	if err != nil {
 		t.Fatal(err)
@@ -74,11 +70,10 @@ func TestCreateProduct(t *testing.T) {
 }
 
 func TestGetProducts(t *testing.T) {
-	app, db, token := setupTestApp()
+	app, db := setupTestApp()
 	// Cria produto para garantir que a lista não esteja vazia
 	db.Create(&models.Product{Code: "003", Price: 30.0, Name: "Produto Lista"})
 	req := httptest.NewRequest("GET", "/api/products", nil)
-	req.Header.Set("Authorization", "Bearer "+token)
 	resp, err := app.Test(req)
 	if err != nil {
 		t.Fatal(err)
@@ -89,12 +84,11 @@ func TestGetProducts(t *testing.T) {
 }
 
 func TestGetProductByID(t *testing.T) {
-	app, db, token := setupTestApp()
+	app, db := setupTestApp()
 	prod := models.Product{Code: "004", Price: 40.0, Name: "Produto ID"}
 	db.Create(&prod)
 	url := fmt.Sprintf("/api/products/%d", prod.ID)
 	req := httptest.NewRequest("GET", url, nil)
-	req.Header.Set("Authorization", "Bearer "+token)
 	resp, err := app.Test(req)
 	if err != nil {
 		t.Fatal(err)
@@ -105,10 +99,9 @@ func TestGetProductByID(t *testing.T) {
 }
 
 func TestGetProductsByName(t *testing.T) {
-	app, db, token := setupTestApp()
+	app, db := setupTestApp()
 	db.Create(&models.Product{Code: "005", Price: 50.0, Name: "Produto Nome"})
 	req := httptest.NewRequest("GET", "/api/products/name/Produto", nil)
-	req.Header.Set("Authorization", "Bearer "+token)
 	resp, err := app.Test(req)
 	if err != nil {
 		t.Fatal(err)
@@ -119,10 +112,9 @@ func TestGetProductsByName(t *testing.T) {
 }
 
 func TestGetProductsByClass(t *testing.T) {
-	app, db, token := setupTestApp()
+	app, db := setupTestApp()
 	db.Create(&models.Product{Code: "006", Price: 60.0, Name: "Produto Classe", ClassID: 123})
 	req := httptest.NewRequest("GET", "/api/products/class/123", nil)
-	req.Header.Set("Authorization", "Bearer "+token)
 	resp, err := app.Test(req)
 	if err != nil {
 		t.Fatal(err)
@@ -133,7 +125,7 @@ func TestGetProductsByClass(t *testing.T) {
 }
 
 func TestUpdateProduct(t *testing.T) {
-	app, db, token := setupTestApp()
+	app, db := setupTestApp()
 	prod := models.Product{Code: "007", Price: 70.0, Name: "Produto Atualizar"}
 	db.Create(&prod)
 	prod.Name = "Produto Atualizado"
@@ -141,7 +133,6 @@ func TestUpdateProduct(t *testing.T) {
 	url := fmt.Sprintf("/api/products/%d", prod.ID)
 	req := httptest.NewRequest("PUT", url, bytes.NewReader(body))
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "Bearer "+token)
 	resp, err := app.Test(req)
 	if err != nil {
 		t.Fatal(err)
@@ -157,12 +148,11 @@ func TestUpdateProduct(t *testing.T) {
 }
 
 func TestDeleteProduct(t *testing.T) {
-	app, db, token := setupTestApp()
+	app, db := setupTestApp()
 	prod := models.Product{Code: "008", Price: 80.0, Name: "Produto Deletar"}
 	db.Create(&prod)
 	url := fmt.Sprintf("/api/products/%d", prod.ID)
 	req := httptest.NewRequest("DELETE", url, nil)
-	req.Header.Set("Authorization", "Bearer "+token)
 	resp, err := app.Test(req)
 	if err != nil {
 		t.Fatal(err)

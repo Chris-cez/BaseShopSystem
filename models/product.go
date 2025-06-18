@@ -7,6 +7,7 @@ type Product struct {
 	Code        string  `json:"code"`
 	Price       float32 `json:"price"`
 	Name        string  `json:"name"`
+	NCM         string  `json:"ncm"`
 	GTIN        string  `json:"gtin"`
 	UM          string  `json:"um"`
 	Description string  `json:"description"`

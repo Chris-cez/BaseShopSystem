@@ -105,16 +105,16 @@ func (r *ProductRepository) GetProductsByClass(c *fiber.Ctx) error {
 }
 
 func (r *ProductRepository) UpdateProduct(c *fiber.Ctx) error {
-	code := c.Params("code")
+	id := c.Params("id")
 	product := models.Product{}
 
-	if code == "" {
+	if id == "" {
 		c.Status(http.StatusInternalServerError).JSON(
-			&fiber.Map{"message": "code can not be empty"})
+			&fiber.Map{"message": "id can not be empty"})
 		return nil
 	}
 
-	err := r.DB.Where("code = ?", code).First(&product).Error
+	err := r.DB.Where("id = ?", id).First(&product).Error
 	if err != nil {
 		c.Status(http.StatusBadRequest).JSON(
 			&fiber.Map{"message": "product not found"})
@@ -141,16 +141,16 @@ func (r *ProductRepository) UpdateProduct(c *fiber.Ctx) error {
 }
 
 func (r *ProductRepository) DeleteProduct(c *fiber.Ctx) error {
-	code := c.Params("code")
+	id := c.Params("id")
 	product := models.Product{}
 
-	if code == "" {
+	if id == "" {
 		c.Status(http.StatusInternalServerError).JSON(
-			&fiber.Map{"message": "code can not be empty"})
+			&fiber.Map{"message": "id can not be empty"})
 		return nil
 	}
 
-	err := r.DB.Where("code = ?", code).First(&product).Error
+	err := r.DB.Where("id = ?", id).First(&product).Error
 	if err != nil {
 		c.Status(http.StatusBadRequest).JSON(
 			&fiber.Map{"message": "product not found"})
@@ -170,12 +170,12 @@ func (r *ProductRepository) DeleteProduct(c *fiber.Ctx) error {
 }
 
 func (r *ProductRepository) SetupProductRoutes(app *fiber.App) {
-	api := app.Group("/api", middleware.AuthRequired)
+	api := app.Group("/api", middleware.AuthRequired) // Adiciona o middleware aqui
 	api.Post("/products", r.CreateProduct)
 	api.Get("/products", r.GetProducts)
 	api.Get("/products/:id", r.GetProductByID)
 	api.Get("/products/name/:name", r.GetProductsByName)
 	api.Get("/products/class/:class_id", r.GetProductsByClass)
-	api.Put("/products/:code", r.UpdateProduct)    // Alterado para code
-	api.Delete("/products/:code", r.DeleteProduct) // Alterado para code
+	api.Put("/products/:id", r.UpdateProduct)
+	api.Delete("/products/:id", r.DeleteProduct)
 }

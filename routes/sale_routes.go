@@ -27,9 +27,9 @@ func (r *SaleRepository) CreateDraftInvoice(c *fiber.Ctx) error {
 // Adiciona um item à nota (invoice)
 func (r *SaleRepository) AddItemToInvoice(c *fiber.Ctx) error {
 	type AddItemRequest struct {
-		InvoiceID uint `json:"invoice_id"`
-		ProductID uint `json:"product_id"`
-		Quantity  int  `json:"quantity"`
+		InvoiceID string `json:"invoice_id"`
+		ProductID uint   `json:"product_id"`
+		Quantity  int    `json:"quantity"`
 	}
 	var req AddItemRequest
 	if err := c.BodyParser(&req); err != nil {

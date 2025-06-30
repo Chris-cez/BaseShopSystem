@@ -11,6 +11,7 @@ import (
 	"github.com/Chris-cez/BaseShopSystem/models"
 	"github.com/Chris-cez/BaseShopSystem/routes"
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
@@ -54,8 +55,7 @@ func TestCreateDraftInvoice(t *testing.T) {
 
 func TestAddItemToInvoice(t *testing.T) {
 	app, db := setupSaleTestApp()
-	// Cria draft
-	invoice := models.Invoice{}
+	invoice := models.Invoice{Numero: uuid.NewString()}
 	db.Create(&invoice)
 	var product models.Product
 	db.First(&product)
@@ -83,8 +83,7 @@ func TestAddItemToInvoice(t *testing.T) {
 
 func TestFinalizeInvoice(t *testing.T) {
 	app, db := setupSaleTestApp()
-	// Cria draft
-	invoice := models.Invoice{}
+	invoice := models.Invoice{Numero: uuid.NewString()}
 	db.Create(&invoice)
 	var client models.Client
 	var pm models.PaymentMethod
@@ -114,8 +113,7 @@ func TestFinalizeInvoice(t *testing.T) {
 
 func TestGetInvoiceItems(t *testing.T) {
 	app, db := setupSaleTestApp()
-	// Cria draft e item
-	invoice := models.Invoice{}
+	invoice := models.Invoice{Numero: uuid.NewString()}
 	db.Create(&invoice)
 	item := models.InvoiceItem{InvoiceID: invoice.Numero, ProductID: 1, Quantity: 1, Price: 5.0, ValorTotal: 5.0}
 	db.Create(&item)

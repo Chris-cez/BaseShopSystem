@@ -41,7 +41,7 @@ func main() {
 	}
 
 	// Inserir dados de teste
-	if err := insertTestData(db); err != nil {
+	if err := InsertTestData(db); err != nil {
 		log.Fatal("Error inserting test data\n", err)
 	}
 

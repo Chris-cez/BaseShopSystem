@@ -6,7 +6,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func insertTestData(db *gorm.DB) error {
+func InsertTestData(db *gorm.DB) error {
 	// Verifica se já existe o endereço de teste
 	var count int64
 	db.Model(&models.Address{}).Where("cep = ?", "12345678").Count(&count)

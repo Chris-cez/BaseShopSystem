@@ -2,10 +2,10 @@ package routes
 
 import (
 	"net/http"
-	"strconv"
 
 	"github.com/Chris-cez/BaseShopSystem/models"
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -16,7 +16,7 @@ type SaleRepository struct {
 // Cria uma nota "inválida" (sem cliente e método de pagamento)
 func (r *SaleRepository) CreateDraftInvoice(c *fiber.Ctx) error {
 	invoice := models.Invoice{
-		// Campos como ClientID e PaymentMethodID ficam nulos
+		Numero: uuid.NewString(), // Gera um número único
 	}
 	if err := r.DB.Create(&invoice).Error; err != nil {
 		return c.Status(http.StatusBadRequest).JSON(&fiber.Map{"message": "could not create draft invoice"})
@@ -49,16 +49,16 @@ func (r *SaleRepository) AddItemToInvoice(c *fiber.Ctx) error {
 // Finaliza a nota, informando cliente e método de pagamento
 func (r *SaleRepository) FinalizeInvoice(c *fiber.Ctx) error {
 	type FinalizeRequest struct {
-		InvoiceID       uint `json:"invoice_id"`
-		ClientID        uint `json:"client_id"`
-		PaymentMethodID uint `json:"payment_method_id"`
+		InvoiceID       string `json:"invoice_id"`
+		ClientID        uint   `json:"client_id"`
+		PaymentMethodID uint   `json:"payment_method_id"`
 	}
 	var req FinalizeRequest
 	if err := c.BodyParser(&req); err != nil {
 		return c.Status(http.StatusUnprocessableEntity).JSON(&fiber.Map{"message": "invalid request"})
 	}
 	var invoice models.Invoice
-	if err := r.DB.First(&invoice, req.InvoiceID).Error; err != nil {
+	if err := r.DB.First(&invoice, "numero = ?", req.InvoiceID).Error; err != nil {
 		return c.Status(http.StatusNotFound).JSON(&fiber.Map{"message": "invoice not found"})
 	}
 	invoice.ClientID = req.ClientID
@@ -71,10 +71,7 @@ func (r *SaleRepository) FinalizeInvoice(c *fiber.Ctx) error {
 
 // Consulta os itens de uma nota
 func (r *SaleRepository) GetInvoiceItems(c *fiber.Ctx) error {
-	invoiceID, err := strconv.Atoi(c.Params("invoice_id"))
-	if err != nil {
-		return c.Status(http.StatusBadRequest).JSON(&fiber.Map{"message": "invalid invoice id"})
-	}
+	invoiceID := c.Params("invoice_id")
 	var items []models.InvoiceItem
 	if err := r.DB.Where("invoice_id = ?", invoiceID).Find(&items).Error; err != nil {
 		return c.Status(http.StatusBadRequest).JSON(&fiber.Map{"message": "could not get items"})

@@ -106,7 +106,7 @@ func (r *ProductRepository) GetProductsByClass(c *fiber.Ctx) error {
 
 func (r *ProductRepository) UpdateProduct(c *fiber.Ctx) error {
 	id := c.Params("id")
-	product := models.Product{}
+	var product models.Product
 
 	if id == "" {
 		c.Status(http.StatusInternalServerError).JSON(
@@ -121,12 +121,25 @@ func (r *ProductRepository) UpdateProduct(c *fiber.Ctx) error {
 		return err
 	}
 
-	err = c.BodyParser(&product)
+	var updateData models.Product
+	err = c.BodyParser(&updateData)
 	if err != nil {
 		c.Status(http.StatusUnprocessableEntity).JSON(
 			&fiber.Map{"message": "Request failed"})
 		return err
 	}
+
+	// Atualize apenas os campos relevantes
+	product.Code = updateData.Code
+	product.Price = updateData.Price
+	product.Name = updateData.Name
+	product.NCM = updateData.NCM
+	product.GTIN = updateData.GTIN
+	product.UM = updateData.UM
+	product.Description = updateData.Description
+	product.ClassID = updateData.ClassID
+	product.Stock = updateData.Stock
+	product.ValTrib = updateData.ValTrib
 
 	err = r.DB.Save(&product).Error
 	if err != nil {

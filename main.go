@@ -4,11 +4,12 @@ import (
 	"log"
 	"os"
 
+	_ "github.com/Chris-cez/BaseShopSystem/docs"
 	"github.com/Chris-cez/BaseShopSystem/routes"
 	"github.com/Chris-cez/BaseShopSystem/storage"
 	"github.com/gofiber/fiber/v2"
 	"github.com/joho/godotenv"
-	"github.com/swaggo/fiber-swagger"
+	fiberSwagger "github.com/swaggo/fiber-swagger"
 	"gorm.io/gorm"
 )
 

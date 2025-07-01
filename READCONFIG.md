@@ -59,6 +59,18 @@ Este documento descreve como rodar o sistema completo, incluindo backend (Go), b
 
 ---
 
+## Documentação da API (Swagger)
+
+Após rodar o backend, acesse a documentação interativa da API pelo navegador:
+
+```
+http://localhost:8080/swagger/index.html
+```
+
+Nessa página você pode visualizar, testar e explorar todos os endpoints disponíveis.
+
+---
+
 ## Rodando os Testes
 
 Execute todos os testes automatizados com:
@@ -128,6 +140,10 @@ DB_SSLMODE=disable
 
 - **Erro 422 ao criar produto:**  
   Verifique se todos os campos obrigatórios estão sendo enviados no JSON.
+
+- **Erro ao acessar a documentação Swagger:**  
+  Certifique-se de que a aplicação está rodando e acesse `http://localhost:8080/swagger/index.html`.  
+  Se aparecer erro "Failed to load API definition", confira se a pasta `docs/` foi gerada com `swag init` e está no mesmo diretório do `main.go`.
 
 ---
 

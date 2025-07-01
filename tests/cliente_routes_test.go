@@ -7,10 +7,12 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/Chris-cez/BaseShopSystem/models"
 	"github.com/Chris-cez/BaseShopSystem/routes"
 	"github.com/gofiber/fiber/v2"
+	"github.com/golang-jwt/jwt/v4"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
@@ -24,6 +26,19 @@ func setupClientTestApp() (*fiber.App, *gorm.DB) {
 	return app, db
 }
 
+// Função auxiliar para gerar um token JWT válido para os testes
+func getClientTestToken() string {
+	claims := jwt.MapClaims{
+		"cnpj": "00000000000191",
+		"exp":  time.Now().Add(time.Hour * 24).Unix(),
+	}
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	// Use a mesma chave secreta do seu middleware
+	jwtSecret := []byte("ed45w3ecrtdxs2t1nmftvby")
+	tokenString, _ := token.SignedString(jwtSecret)
+	return tokenString
+}
+
 func TestCreateClient(t *testing.T) {
 	app, db := setupClientTestApp()
 	client := models.Client{
@@ -34,6 +49,7 @@ func TestCreateClient(t *testing.T) {
 	body, _ := json.Marshal(client)
 	req := httptest.NewRequest("POST", "/api/clients", bytes.NewReader(body))
 	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Bearer "+getClientTestToken())
 	resp, err := app.Test(req)
 	if err != nil {
 		t.Fatal(err)
@@ -52,6 +68,7 @@ func TestGetClients(t *testing.T) {
 	app, db := setupClientTestApp()
 	db.Create(&models.Client{Name: "Cliente Lista", CPF: "11122233344", AddressID: 1})
 	req := httptest.NewRequest("GET", "/api/clients", nil)
+	req.Header.Set("Authorization", "Bearer "+getClientTestToken())
 	resp, err := app.Test(req)
 	if err != nil {
 		t.Fatal(err)
@@ -67,6 +84,7 @@ func TestGetClientByID(t *testing.T) {
 	db.Create(&client)
 	url := fmt.Sprintf("/api/clients/%d", client.ID)
 	req := httptest.NewRequest("GET", url, nil)
+	req.Header.Set("Authorization", "Bearer "+getClientTestToken())
 	resp, err := app.Test(req)
 	if err != nil {
 		t.Fatal(err)
@@ -85,6 +103,7 @@ func TestUpdateClient(t *testing.T) {
 	url := fmt.Sprintf("/api/clients/%d", client.ID)
 	req := httptest.NewRequest("PUT", url, bytes.NewReader(body))
 	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Bearer "+getClientTestToken())
 	resp, err := app.Test(req)
 	if err != nil {
 		t.Fatal(err)
@@ -105,6 +124,7 @@ func TestDeleteClient(t *testing.T) {
 	db.Create(&client)
 	url := fmt.Sprintf("/api/clients/%d", client.ID)
 	req := httptest.NewRequest("DELETE", url, nil)
+	req.Header.Set("Authorization", "Bearer "+getClientTestToken())
 	resp, err := app.Test(req)
 	if err != nil {
 		t.Fatal(err)

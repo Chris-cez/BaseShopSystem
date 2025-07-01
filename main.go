@@ -8,6 +8,7 @@ import (
 	"github.com/Chris-cez/BaseShopSystem/storage"
 	"github.com/gofiber/fiber/v2"
 	"github.com/joho/godotenv"
+	"github.com/swaggo/fiber-swagger"
 	"gorm.io/gorm"
 )
 
@@ -48,6 +49,8 @@ func main() {
 	app := fiber.New()
 
 	routes.SetupRoutes(app, db)
+
+	app.Get("/swagger/*", fiberSwagger.WrapHandler)
 
 	log.Fatal(app.Listen(":8080"))
 }

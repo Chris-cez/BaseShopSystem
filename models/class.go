@@ -3,7 +3,7 @@ package models
 import "gorm.io/gorm"
 
 type Class struct {
-	gorm.Model
+	gorm.Model  `swaggerignore:"true"`
 	Name        string `json:"name"`
 	Description string `json:"description"`
 	NCM         string `json:"ncm"`

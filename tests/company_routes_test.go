@@ -24,6 +24,20 @@ func setupCompanyTestApp() (*fiber.App, *gorm.DB) {
 	repo.SetupCompanyRoutes(app)
 	return app, db
 }
+func getAuthToken(app *fiber.App, cnpj, password string) string {
+	authReq := map[string]string{
+		"cnpj":     cnpj,
+		"password": password,
+	}
+	body, _ := json.Marshal(authReq)
+	req := httptest.NewRequest("POST", "/entrar", bytes.NewReader(body))
+	req.Header.Set("Content-Type", "application/json")
+	resp, _ := app.Test(req)
+	var result map[string]interface{}
+	json.NewDecoder(resp.Body).Decode(&result)
+	token, _ := result["token"].(string)
+	return token
+}
 
 func createTestCompany(db *gorm.DB) models.Company {
 	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte("senha123"), bcrypt.DefaultCost)
@@ -40,7 +54,9 @@ func createTestCompany(db *gorm.DB) models.Company {
 
 func TestCreateCompany(t *testing.T) {
 	app, db := setupCompanyTestApp()
-	company := models.Company{
+	company := createTestCompany(db)
+	token := getAuthToken(app, company.CNPJ, "senha123")
+	company = models.Company{
 		Name:              "Empresa Nova",
 		CNPJ:              "98765432000199",
 		InscricaoEstadual: "ISENTO",
@@ -50,6 +66,7 @@ func TestCreateCompany(t *testing.T) {
 	body, _ := json.Marshal(company)
 	req := httptest.NewRequest("POST", "/api/company", bytes.NewReader(body))
 	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Bearer "+token)
 	resp, err := app.Test(req)
 	if err != nil {
 		t.Fatal(err)
@@ -67,13 +84,15 @@ func TestCreateCompany(t *testing.T) {
 func TestAuthenticateCompany(t *testing.T) {
 	app, db := setupCompanyTestApp()
 	company := createTestCompany(db)
+	token := getAuthToken(app, company.CNPJ, "senha123")
 	authReq := map[string]string{
 		"cnpj":     company.CNPJ,
 		"password": "senha123",
 	}
 	body, _ := json.Marshal(authReq)
-	req := httptest.NewRequest("POST", "/api/entrar", bytes.NewReader(body))
+	req := httptest.NewRequest("POST", "/entrar", bytes.NewReader(body))
 	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Bearer "+token)
 	resp, err := app.Test(req)
 	if err != nil {
 		t.Fatal(err)
@@ -90,8 +109,10 @@ func TestAuthenticateCompany(t *testing.T) {
 
 func TestGetCompanies(t *testing.T) {
 	app, db := setupCompanyTestApp()
-	createTestCompany(db)
+	company := createTestCompany(db)
+	token := getAuthToken(app, company.CNPJ, "senha123")
 	req := httptest.NewRequest("GET", "/api/company", nil)
+	req.Header.Set("Authorization", "Bearer "+token)
 	resp, err := app.Test(req)
 	if err != nil {
 		t.Fatal(err)
@@ -104,8 +125,10 @@ func TestGetCompanies(t *testing.T) {
 func TestGetCompanyByID(t *testing.T) {
 	app, db := setupCompanyTestApp()
 	company := createTestCompany(db)
+	token := getAuthToken(app, company.CNPJ, "senha123")
 	url := fmt.Sprintf("/api/company/%d", company.ID)
 	req := httptest.NewRequest("GET", url, nil)
+	req.Header.Set("Authorization", "Bearer "+token)
 	resp, err := app.Test(req)
 	if err != nil {
 		t.Fatal(err)
@@ -118,11 +141,13 @@ func TestGetCompanyByID(t *testing.T) {
 func TestUpdateCompany(t *testing.T) {
 	app, db := setupCompanyTestApp()
 	company := createTestCompany(db)
+	token := getAuthToken(app, company.CNPJ, "senha123")
 	company.Name = "Empresa Atualizada"
 	body, _ := json.Marshal(company)
 	url := fmt.Sprintf("/api/company/%d", company.ID)
 	req := httptest.NewRequest("PUT", url, bytes.NewReader(body))
 	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Bearer "+token)
 	resp, err := app.Test(req)
 	if err != nil {
 		t.Fatal(err)

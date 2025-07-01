@@ -5,7 +5,7 @@ import (
 )
 
 type InvoiceItem struct {
-	gorm.Model
+	gorm.Model `swaggerignore:"true"`
 	ProductID  uint    `json:"product_id"`
 	InvoiceID  string  `json:"invoice_id"`
 	Quantity   int     `json:"quantity"`

@@ -3,6 +3,7 @@ package routes
 import (
 	"net/http"
 
+	"github.com/Chris-cez/BaseShopSystem/middleware"
 	"github.com/Chris-cez/BaseShopSystem/models"
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
@@ -12,6 +13,17 @@ type InvoiceItemRepository struct {
 	DB *gorm.DB
 }
 
+// CreateInvoiceItem godoc
+// @Summary Cria um novo item de nota fiscal
+// @Description Adiciona um novo item à nota fiscal
+// @Tags invoice_item
+// @Accept  json
+// @Produce  json
+// @Param invoice_item body models.InvoiceItem true "Dados do item da nota"
+// @Success 200 {object} map[string]string
+// @Failure 400 {object} map[string]string
+// @Failure 422 {object} map[string]string
+// @Router /api/invoice_items [post]
 func (r *InvoiceItemRepository) CreateInvoiceItem(c *fiber.Ctx) error {
 	invoiceItem := models.InvoiceItem{}
 
@@ -33,6 +45,15 @@ func (r *InvoiceItemRepository) CreateInvoiceItem(c *fiber.Ctx) error {
 	return nil
 }
 
+// GetInvoiceItems godoc
+// @Summary Lista todos os itens de nota fiscal
+// @Description Retorna todos os itens de nota fiscal cadastrados
+// @Tags invoice_item
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]string
+// @Router /api/invoice_items [get]
 func (r *InvoiceItemRepository) GetInvoiceItems(c *fiber.Ctx) error {
 	invoiceItemModels := []models.InvoiceItem{}
 	err := r.DB.Find(&invoiceItemModels).Error
@@ -47,6 +68,17 @@ func (r *InvoiceItemRepository) GetInvoiceItems(c *fiber.Ctx) error {
 	return nil
 }
 
+// GetInvoiceItemByID godoc
+// @Summary Busca item de nota fiscal por ID
+// @Description Retorna um item de nota fiscal pelo seu ID
+// @Tags invoice_item
+// @Accept  json
+// @Produce  json
+// @Param id path int true "ID do item da nota"
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /api/invoice_items/{id} [get]
 func (r *InvoiceItemRepository) GetInvoiceItemByID(c *fiber.Ctx) error {
 	id := c.Params("id")
 	invoiceItemModel := models.InvoiceItem{}
@@ -69,6 +101,19 @@ func (r *InvoiceItemRepository) GetInvoiceItemByID(c *fiber.Ctx) error {
 	return nil
 }
 
+// UpdateInvoiceItem godoc
+// @Summary Atualiza um item de nota fiscal
+// @Description Atualiza os dados de um item de nota fiscal existente
+// @Tags invoice_item
+// @Accept  json
+// @Produce  json
+// @Param id path int true "ID do item da nota"
+// @Param invoice_item body models.InvoiceItem true "Dados do item da nota"
+// @Success 200 {object} map[string]string
+// @Failure 400 {object} map[string]string
+// @Failure 422 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /api/invoice_items/{id} [put]
 func (r *InvoiceItemRepository) UpdateInvoiceItem(c *fiber.Ctx) error {
 	id := c.Params("id")
 	invoiceItem := models.InvoiceItem{}
@@ -106,7 +151,7 @@ func (r *InvoiceItemRepository) UpdateInvoiceItem(c *fiber.Ctx) error {
 }
 
 func (r *InvoiceItemRepository) SetupInvoiceItemRoutes(app *fiber.App) {
-	api := app.Group("/api")
+	api := app.Group("/api", middleware.AuthRequired)
 	api.Post("/invoice_items", r.CreateInvoiceItem)
 	api.Get("/invoice_items", r.GetInvoiceItems)
 	api.Get("/invoice_items/:id", r.GetInvoiceItemByID)

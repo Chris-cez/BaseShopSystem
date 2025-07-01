@@ -40,7 +40,7 @@ func createProduct(app *fiber.App, t *testing.T, db *gorm.DB) uint {
 	}
 	body, _ := json.Marshal(product)
 	req := httptest.NewRequest("POST", "/api/products", bytes.NewReader(body))
-	req.Header.Set("Authorization", "Bearer "+getTestToken())
+	req.Header.Set("Authorization", "Bearer "+getTestProductToken())
 	resp, err := app.Test(req)
 	if err != nil || resp.StatusCode != http.StatusOK {
 		t.Fatalf("Erro ao criar produto: %v", err)
@@ -50,7 +50,7 @@ func createProduct(app *fiber.App, t *testing.T, db *gorm.DB) uint {
 	return createdProduct.ID
 }
 
-func getTestToken() string {
+func getTestProductToken() string {
 	token, _ := middleware.GenerateJWT("12345678000199")
 	return token
 }
@@ -58,7 +58,6 @@ func getTestToken() string {
 func TestCreateProduct(t *testing.T) {
 	app, db := setupTestApp()
 
-	// Use um map para garantir que o JSON gerado tenha os nomes corretos
 	product := map[string]interface{}{
 		"code":        "001",
 		"price":       10.0,
@@ -73,7 +72,7 @@ func TestCreateProduct(t *testing.T) {
 	}
 	body, _ := json.Marshal(product)
 	req := httptest.NewRequest("POST", "/api/products", bytes.NewReader(body))
-	req.Header.Set("Authorization", "Bearer "+getTestToken())
+	req.Header.Set("Authorization", "Bearer "+getTestProductToken())
 	req.Header.Set("Content-Type", "application/json")
 	resp, err := app.Test(req)
 	if err != nil {
@@ -83,7 +82,6 @@ func TestCreateProduct(t *testing.T) {
 		t.Errorf("esperado status 200, obteve %d", resp.StatusCode)
 	}
 
-	// Verifica se o produto foi criado no banco
 	var count int64
 	db.Model(&models.Product{}).Where("code = ?", "001").Count(&count)
 	if count != 1 {
@@ -106,7 +104,7 @@ func TestGetProducts(t *testing.T) {
 		ValTrib:     0.2,
 	})
 	req := httptest.NewRequest("GET", "/api/products", nil)
-	req.Header.Set("Authorization", "Bearer "+getTestToken())
+	req.Header.Set("Authorization", "Bearer "+getTestProductToken())
 	resp, err := app.Test(req)
 	if err != nil {
 		t.Fatal(err)
@@ -133,7 +131,7 @@ func TestGetProductByID(t *testing.T) {
 	db.Create(&prod)
 	url := fmt.Sprintf("/api/products/%d", prod.ID)
 	req := httptest.NewRequest("GET", url, nil)
-	req.Header.Set("Authorization", "Bearer "+getTestToken())
+	req.Header.Set("Authorization", "Bearer "+getTestProductToken())
 	resp, err := app.Test(req)
 	if err != nil {
 		t.Fatal(err)
@@ -158,7 +156,7 @@ func TestGetProductsByName(t *testing.T) {
 		ValTrib:     0.4,
 	})
 	req := httptest.NewRequest("GET", "/api/products/name/Produto", nil)
-	req.Header.Set("Authorization", "Bearer "+getTestToken())
+	req.Header.Set("Authorization", "Bearer "+getTestProductToken())
 	resp, err := app.Test(req)
 	if err != nil {
 		t.Fatal(err)
@@ -183,7 +181,7 @@ func TestGetProductsByClass(t *testing.T) {
 		ValTrib:     0.6,
 	})
 	req := httptest.NewRequest("GET", "/api/products/class/123", nil)
-	req.Header.Set("Authorization", "Bearer "+getTestToken())
+	req.Header.Set("Authorization", "Bearer "+getTestProductToken())
 	resp, err := app.Test(req)
 	if err != nil {
 		t.Fatal(err)
@@ -196,7 +194,6 @@ func TestGetProductsByClass(t *testing.T) {
 func TestUpdateProduct(t *testing.T) {
 	app, db := setupTestApp()
 
-	// Cria produto inicial
 	prod := models.Product{
 		Code:        "002",
 		Price:       20.0,
@@ -211,7 +208,6 @@ func TestUpdateProduct(t *testing.T) {
 	}
 	db.Create(&prod)
 
-	// Atualiza o produto
 	update := map[string]interface{}{
 		"code":        "002",
 		"price":       25.0,
@@ -227,7 +223,7 @@ func TestUpdateProduct(t *testing.T) {
 	body, _ := json.Marshal(update)
 	url := fmt.Sprintf("/api/products/%d", prod.ID)
 	req := httptest.NewRequest("PUT", url, bytes.NewReader(body))
-	req.Header.Set("Authorization", "Bearer "+getTestToken())
+	req.Header.Set("Authorization", "Bearer "+getTestProductToken())
 	req.Header.Set("Content-Type", "application/json")
 	resp, err := app.Test(req)
 	if err != nil {
@@ -237,7 +233,6 @@ func TestUpdateProduct(t *testing.T) {
 		t.Errorf("esperado status 200, obteve %d", resp.StatusCode)
 	}
 
-	// Verifica se o produto foi atualizado
 	var updated models.Product
 	db.First(&updated, prod.ID)
 	if updated.Name != "Produto Atualizado" || updated.Price != 25.0 || updated.Stock != 60 || updated.ValTrib != 1.5 {
@@ -262,7 +257,7 @@ func TestDeleteProduct(t *testing.T) {
 	db.Create(&prod)
 	url := fmt.Sprintf("/api/products/%d", prod.ID)
 	req := httptest.NewRequest("DELETE", url, nil)
-	req.Header.Set("Authorization", "Bearer "+getTestToken())
+	req.Header.Set("Authorization", "Bearer "+getTestProductToken())
 	resp, err := app.Test(req)
 	if err != nil {
 		t.Fatal(err)

@@ -3,7 +3,7 @@ package models
 import "gorm.io/gorm"
 
 type Address struct {
-	gorm.Model
+	gorm.Model  `swaggerignore:"true"`
 	Logradouro  string `json:"logradouro"`
 	Numero      string `json:"numero"`
 	Complemento string `json:"complemento"`

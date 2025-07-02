@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:login_bss/crud_template.dart';
 import 'package:login_bss/prod.dart';
+import 'package:login_bss/vendas.dart'; 
 import 'g.dart';
 
 class MW extends StatefulWidget {
@@ -108,7 +109,7 @@ class _MWS extends State<MW> {
     if (pageIndex == 1) {
       return T<P$, Pb>((context) => Pb(P$()));
     } else if (pageIndex == 2) {
-      return Text('Vendas');
+      return VendaPage(); // Aqui!
     } else if (pageIndex == 3) {
       return Text('Clientes');
     }

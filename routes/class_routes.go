@@ -150,10 +150,37 @@ func (r *ClassRepository) UpdateClass(c *fiber.Ctx) error {
 	return nil
 }
 
+// GetClassesByName godoc
+// @Summary Busca classes por nome
+// @Description Retorna classes que contenham o nome informado
+// @Tags class
+// @Accept  json
+// @Produce  json
+// @Param name path string true "Nome da classe"
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]string
+// @Router /api/classes/name/{name} [get]
+func (r *ClassRepository) GetClassesByName(c *fiber.Ctx) error {
+	name := c.Params("name")
+	classModels := []models.Class{}
+
+	err := r.DB.Where("name LIKE ?", "%"+name+"%").Find(&classModels).Error
+	if err != nil {
+		c.Status(http.StatusBadRequest).JSON(
+			&fiber.Map{"message": "could not get classes by name"})
+		return err
+	}
+	c.Status(http.StatusOK).JSON(
+		&fiber.Map{"message": "classes fetched successfully",
+			"data": classModels})
+	return nil
+}
+
 func (r *ClassRepository) SetupClassRoutes(app *fiber.App) {
 	api := app.Group("/api", middleware.AuthRequired)
 	api.Post("/classes", r.CreateClass)
 	api.Get("/classes", r.GetClasses)
 	api.Get("/classes/:id", r.GetClassByID)
+	api.Get("/classes/name/:name", r.GetClassesByName) // Nova rota
 	api.Put("/classes/:id", r.UpdateClass)
 }

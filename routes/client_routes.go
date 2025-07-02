@@ -190,10 +190,64 @@ func (r *ClientRepository) DeleteClient(c *fiber.Ctx) error {
 	return nil
 }
 
+// GetClientsByName godoc
+// @Summary Busca clientes por nome
+// @Description Retorna clientes que contenham o nome informado
+// @Tags client
+// @Accept  json
+// @Produce  json
+// @Param name path string true "Nome do cliente"
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]string
+// @Router /api/clients/name/{name} [get]
+func (r *ClientRepository) GetClientsByName(c *fiber.Ctx) error {
+	name := c.Params("name")
+	clientModels := []models.Client{}
+
+	err := r.DB.Where("name ILIKE ?", "%"+name+"%").Find(&clientModels).Error
+	if err != nil {
+		c.Status(http.StatusBadRequest).JSON(
+			&fiber.Map{"message": "could not get clients by name"})
+		return err
+	}
+	c.Status(http.StatusOK).JSON(
+		&fiber.Map{"message": "clients fetched successfully",
+			"data": clientModels})
+	return nil
+}
+
+// GetClientsByCPF godoc
+// @Summary Busca cliente por CPF
+// @Description Retorna um cliente pelo CPF informado
+// @Tags client
+// @Accept  json
+// @Produce  json
+// @Param cpf path string true "CPF do cliente"
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]string
+// @Router /api/clients/cpf/{cpf} [get]
+func (r *ClientRepository) GetClientsByCPF(c *fiber.Ctx) error {
+	cpf := c.Params("cpf")
+	clientModel := models.Client{}
+
+	err := r.DB.Where("cpf = ?", cpf).First(&clientModel).Error
+	if err != nil {
+		c.Status(http.StatusBadRequest).JSON(
+			&fiber.Map{"message": "could not get client by CPF"})
+		return err
+	}
+	c.Status(http.StatusOK).JSON(
+		&fiber.Map{"message": "client fetched successfully",
+			"data": clientModel})
+	return nil
+}
+
 func (r *ClientRepository) SetupClientRoutes(app *fiber.App) {
 	api := app.Group("/api", middleware.AuthRequired)
 	api.Post("/clients", r.CreateClient)
 	api.Get("/clients", r.GetClients)
+	api.Get("/clients/name/:name", r.GetClientsByName)
+	api.Get("/clients/cpf/:cpf", r.GetClientsByCPF)
 	api.Get("/clients/:id", r.GetClientByID)
 	api.Put("/clients/:id", r.UpdateClient)
 	api.Delete("/clients/:id", r.DeleteClient)

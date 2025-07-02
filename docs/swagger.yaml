@@ -379,6 +379,34 @@ paths:
       summary: Atualiza uma classe
       tags:
       - class
+  /api/classes/name/{name}:
+    get:
+      consumes:
+      - application/json
+      description: Retorna classes que contenham o nome informado
+      parameters:
+      - description: Nome da classe
+        in: path
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Busca classes por nome
+      tags:
+      - class
   /api/clients:
     get:
       consumes:
@@ -548,6 +576,62 @@ paths:
               type: string
             type: object
       summary: Atualiza um cliente
+      tags:
+      - client
+  /api/clients/cpf/{cpf}:
+    get:
+      consumes:
+      - application/json
+      description: Retorna um cliente pelo CPF informado
+      parameters:
+      - description: CPF do cliente
+        in: path
+        name: cpf
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Busca cliente por CPF
+      tags:
+      - client
+  /api/clients/name/{name}:
+    get:
+      consumes:
+      - application/json
+      description: Retorna clientes que contenham o nome informado
+      parameters:
+      - description: Nome do cliente
+        in: path
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Busca clientes por nome
       tags:
       - client
   /api/company:
@@ -779,6 +863,40 @@ paths:
       tags:
       - invoice_item
   /api/invoice_items/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Deleta um item de nota fiscal pelo ID
+      parameters:
+      - description: ID do item da nota
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Remove um item de nota fiscal
+      tags:
+      - invoice_item
     get:
       consumes:
       - application/json
@@ -949,6 +1067,28 @@ paths:
       summary: Busca nota fiscal por ID
       tags:
       - invoice
+  /api/payment_methods:
+    get:
+      consumes:
+      - application/json
+      description: Retorna todos os métodos de pagamento cadastrados
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Lista todos os métodos de pagamento
+      tags:
+      - payment_method
   /api/products:
     get:
       consumes:

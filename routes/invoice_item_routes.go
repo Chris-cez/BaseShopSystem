@@ -150,10 +150,47 @@ func (r *InvoiceItemRepository) UpdateInvoiceItem(c *fiber.Ctx) error {
 	return nil
 }
 
+// DeleteInvoiceItem godoc
+// @Summary Remove um item de nota fiscal
+// @Description Deleta um item de nota fiscal pelo ID
+// @Tags invoice_item
+// @Accept  json
+// @Produce  json
+// @Param id path int true "ID do item da nota"
+// @Success 200 {object} map[string]string
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /api/invoice_items/{id} [delete]
+func (r *InvoiceItemRepository) DeleteInvoiceItem(c *fiber.Ctx) error {
+	id := c.Params("id")
+	invoiceItem := models.InvoiceItem{}
+
+	if id == "" {
+		return c.Status(http.StatusInternalServerError).JSON(
+			&fiber.Map{"message": "id can not be empty"})
+	}
+
+	err := r.DB.Where("id = ?", id).First(&invoiceItem).Error
+	if err != nil {
+		return c.Status(http.StatusBadRequest).JSON(
+			&fiber.Map{"message": "invoice item not found"})
+	}
+
+	err = r.DB.Delete(&invoiceItem).Error
+	if err != nil {
+		return c.Status(http.StatusBadRequest).JSON(
+			&fiber.Map{"message": "could not delete invoice item"})
+	}
+
+	return c.Status(http.StatusOK).JSON(
+		&fiber.Map{"message": "invoice item deleted successfully"})
+}
+
 func (r *InvoiceItemRepository) SetupInvoiceItemRoutes(app *fiber.App) {
 	api := app.Group("/api", middleware.AuthRequired)
 	api.Post("/invoice_items", r.CreateInvoiceItem)
 	api.Get("/invoice_items", r.GetInvoiceItems)
 	api.Get("/invoice_items/:id", r.GetInvoiceItemByID)
 	api.Put("/invoice_items/:id", r.UpdateInvoiceItem)
+	api.Delete("/invoice_items/:id", r.DeleteInvoiceItem)
 }

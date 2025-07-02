@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:login_bss/cli.dart';
 import 'package:login_bss/crud_template.dart';
+import 'package:login_bss/inv.dart';
 import 'package:login_bss/prod.dart';
 import 'package:login_bss/vendas.dart'; 
 import 'g.dart';
@@ -109,9 +111,9 @@ class _MWS extends State<MW> {
     if (pageIndex == 1) {
       return T<P$, Pb>((context) => Pb(P$()));
     } else if (pageIndex == 2) {
-      return VendaPage(); // Aqui!
+      return T<I$, Ib>((context) => Ib(I$()))..mode="C";
     } else if (pageIndex == 3) {
-      return Text('Clientes');
+      return T<C$, Cb>((context) => Cb(C$()));
     }
     return Text('Página inicial');
   }

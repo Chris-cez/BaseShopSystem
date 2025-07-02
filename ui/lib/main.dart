@@ -9,6 +9,12 @@ void main() {
   runApp(const MyApp());
 }
 
+
+// Adicione uma GlobalKey para o Navigator no main.dart:
+
+// --- No main.dart, adicione no topo ---
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
 class ECx extends EC {
   @override
   Future<bool> login(String pj, String psw) async {
@@ -37,6 +43,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      navigatorKey: navigatorKey,
       title: 'BSS',
       home: EW(ec: ECx()),
       routes: {

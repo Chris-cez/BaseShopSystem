@@ -33,11 +33,31 @@ func (r *InvoiceItemRepository) CreateInvoiceItem(c *fiber.Ctx) error {
 			&fiber.Map{"message": "Request failed"})
 		return err
 	}
+
+	// Buscar preço do produto
+	var product models.Product
+	if err := r.DB.First(&product, invoiceItem.ProductID).Error; err != nil {
+		c.Status(http.StatusBadRequest).JSON(
+			&fiber.Map{"message": "product not found"})
+		return err
+	}
+
+	invoiceItem.Price = product.Price
+	invoiceItem.ValorTotal = product.Price * float64(invoiceItem.Quantity)
+
+	// Adiciona o item
 	err = r.DB.Create(&invoiceItem).Error
 	if err != nil {
 		c.Status(http.StatusBadRequest).JSON(
 			&fiber.Map{"message": "could not create invoice item"})
 		return err
+	}
+
+	// Atualiza o total da nota fiscal
+	var invoice models.Invoice
+	if err := r.DB.Where("numero = ?", invoiceItem.InvoiceID).First(&invoice).Error; err == nil {
+		invoice.TotalValue += invoiceItem.ValorTotal
+		r.DB.Save(&invoice)
 	}
 
 	c.Status(http.StatusOK).JSON(

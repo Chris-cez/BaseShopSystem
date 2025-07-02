@@ -6,6 +6,7 @@ import (
 	"github.com/Chris-cez/BaseShopSystem/middleware"
 	"github.com/Chris-cez/BaseShopSystem/models"
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -33,6 +34,7 @@ func (r *InvoiceRepository) CreateInvoice(c *fiber.Ctx) error {
 			&fiber.Map{"message": "Request failed"})
 		return err
 	}
+	invoice.AccessKey = uuid.NewString() // Gera chave de acesso única
 	err = r.DB.Create(&invoice).Error
 	if err != nil {
 		c.Status(http.StatusBadRequest).JSON(
@@ -62,9 +64,49 @@ func (r *InvoiceRepository) GetInvoices(c *fiber.Ctx) error {
 			&fiber.Map{"message": "could not get invoices"})
 		return err
 	}
+
+	// Buscar clientes e métodos de pagamento em lote para mapear nomes
+	type Client struct {
+		ID   uint
+		Name string
+	}
+	type PaymentMethod struct {
+		ID   uint
+		Name string
+	}
+	var clients []Client
+	var paymentMethods []PaymentMethod
+	r.DB.Model(&models.Client{}).Select("id, name").Find(&clients)
+	r.DB.Model(&models.PaymentMethod{}).Select("id, name").Find(&paymentMethods)
+
+	clientMap := make(map[uint]string)
+	for _, c := range clients {
+		clientMap[c.ID] = c.Name
+	}
+	pmMap := make(map[uint]string)
+	for _, pm := range paymentMethods {
+		pmMap[pm.ID] = pm.Name
+	}
+
+	// Montar resposta enriquecida
+	var enriched []map[string]interface{}
+	for _, inv := range invoiceModels {
+		enriched = append(enriched, map[string]interface{}{
+			"numero":              inv.Numero,
+			"client_id":           inv.ClientID,
+			"client_name":         clientMap[inv.ClientID],
+			"total":               inv.TotalValue,
+			"payment_method_id":   inv.PaymentMethodID,
+			"payment_method_name": pmMap[inv.PaymentMethodID],
+			"discount":            inv.Discount,
+			"observation":         inv.Observation,
+			"chave_acesso":        inv.AccessKey,
+		})
+	}
+
 	c.Status(http.StatusOK).JSON(
 		&fiber.Map{"message": "invoices fetched successfully",
-			"data": invoiceModels})
+			"data": enriched})
 	return nil
 }
 

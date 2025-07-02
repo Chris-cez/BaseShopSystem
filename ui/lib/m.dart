@@ -3,7 +3,6 @@ import 'package:login_bss/cli.dart';
 import 'package:login_bss/crud_template.dart';
 import 'package:login_bss/inv.dart';
 import 'package:login_bss/prod.dart';
-import 'package:login_bss/vendas.dart'; 
 import 'g.dart';
 
 class MW extends StatefulWidget {

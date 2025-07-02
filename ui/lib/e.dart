@@ -91,7 +91,7 @@ class _EWS extends State<EW> {
             ],
           ),
           child: BlocProvider(
-            create: (context) => EB(widget.ec),
+            create: (context) => EB(widget.ec)..add(EET("12345678000199","senha123")),
             child: BlocListener<EB, ES>(
               listener: (context, state) {
                 if (state is ESS) {

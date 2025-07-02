@@ -134,8 +134,10 @@ class FDbl extends Fld {
 // ignore: must_be_immutable
 class T<S extends Source, B extends Tb<S>> extends StatefulWidget {
   B Function(BuildContext) bloc;
+  String mode;
+  bool Function(List)? isSelected;
 
-  T(this.bloc, {super.key});
+  T(this.bloc, {super.key, this.mode = "CRUD", this.isSelected});
 
   @override
   State<T<S, B>> createState() => _Ts<S, B>();
@@ -316,6 +318,7 @@ class _Ts<S extends Source, B extends Tb<S>> extends State<T<S, B>> {
                       List<DataRow> rows = [];
                       for (int i = 0; i < $.fetched.length; i++) {
                         $.index = i;
+                        if ((widget.mode == "SELECT") && (i == 0)) continue;
                         DataCell ops = DataCell(SizedBox.shrink());
                         if (i == 0) {
                           ops = DataCell(
@@ -333,33 +336,35 @@ class _Ts<S extends Source, B extends Tb<S>> extends State<T<S, B>> {
                             ),
                           );
                         } else if ($.editingIndex != $.index) {
-                          ops = DataCell(
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                IconButton(
-                                  onPressed: () {
-                                    setState(() {
-                                      $.temp = [...$.fetched[i]];
-                                      $.editingIndex = i;
-                                    });
-                                  },
-                                  icon: Icon(Icons.edit),
-                                ),
-                                IconButton(
-                                  onPressed: () {
-                                    setState(() {
-                                      $.index = i;
-                                      $.temp = [...$.fetched[i]];
-                                      context.read<B>().add(DeleteEvent());
-                                    });
-                                  },
-                                  icon: Icon(Icons.delete),
-                                ),
-                              ],
-                            ),
-                          );
+                          if (widget.mode == "CRUD") {
+                            ops = DataCell(
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  IconButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        $.temp = [...$.fetched[i]];
+                                        $.editingIndex = i;
+                                      });
+                                    },
+                                    icon: Icon(Icons.edit),
+                                  ),
+                                  IconButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        $.index = i;
+                                        $.temp = [...$.fetched[i]];
+                                        context.read<B>().add(DeleteEvent());
+                                      });
+                                    },
+                                    icon: Icon(Icons.delete),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }
                         } else {
                           ops = DataCell(
                             Row(
@@ -415,14 +420,25 @@ class _Ts<S extends Source, B extends Tb<S>> extends State<T<S, B>> {
                             }
                           }
                         }
+                        bool sel = false;
+                        if (widget.isSelected != null) {
+                          sel = widget.isSelected!($.fetched[i]);
+                        }
+                        if (widget.mode != "SELECT") {
+                          dcells.add(ops);
+                        }
                         rows.add(
                           DataRow(
+                            onSelectChanged: (widget.isSelected != null) ? (value) {
+                              Navigator.of(context).pop($.fetched[i]);
+                            } : null,
+                            selected: sel,
                             color: WidgetStateColor.resolveWith((states) {
                               return i % 2 == 0
                                   ? Colors.grey.shade300
                                   : Colors.white;
                             }),
-                            cells: [...dcells, ops],
+                            cells: dcells,
                           ),
                         );
                       }
@@ -439,18 +455,19 @@ class _Ts<S extends Source, B extends Tb<S>> extends State<T<S, B>> {
                           );
                         }
                       }
-                      return DataTable(
-                        columns: [
-                          ...columns,
-                          DataColumn(
+                      if (widget.mode != "SELECT") {
+                        columns.add(DataColumn(
                             label: Text(
                               'Operações',
                               style: TextStyle(fontWeight: FontWeight.bold),
                             ),
                             columnWidth: FlexColumnWidth(1),
                             headingRowAlignment: MainAxisAlignment.end,
-                          ),
-                        ],
+                          ),);
+                      }
+                      return DataTable(
+                        onSelectAll: (v){},
+                        columns: columns,
                         rows: rows,
                       );
                     } else {

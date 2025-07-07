@@ -3,7 +3,6 @@ import 'package:login_bss/cli.dart';
 import 'package:login_bss/crud_template.dart';
 import 'package:login_bss/inv.dart';
 import 'package:login_bss/prod.dart';
-import 'package:login_bss/vendas.dart'; 
 import 'g.dart';
 
 class MW extends StatefulWidget {
@@ -13,7 +12,7 @@ class MW extends StatefulWidget {
   State<MW> createState() => _MWS();
 }
 
-final List<String> pageNames = ['Início', 'Produtos', 'Vendas', 'Clientes'];
+final List<String> pageNames = ['Produtos', 'Vendas', 'Clientes'];
 
 class _MWS extends State<MW> {
   int pageIndex = 0;
@@ -108,13 +107,13 @@ class _MWS extends State<MW> {
   }
 
   Widget _buildContent(BuildContext context) {
-    if (pageIndex == 1) {
+    if (pageIndex == 0) {
       return T<P$, Pb>((context) => Pb(P$()));
+    } else if (pageIndex == 1) {
+      return VendasPage();
     } else if (pageIndex == 2) {
-      return T<I$, Ib>((context) => Ib(I$()))..mode="C";
-    } else if (pageIndex == 3) {
       return T<C$, Cb>((context) => Cb(C$()));
     }
-    return Text('Página inicial');
+    return Text('???');
   }
 }

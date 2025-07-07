@@ -1,0 +1,1448 @@
+definitions:
+  models.Address:
+    properties:
+      bairro:
+        type: string
+      cep:
+        type: string
+      complemento:
+        type: string
+      logradouro:
+        type: string
+      municipio:
+        type: string
+      numero:
+        type: string
+      uf:
+        type: string
+    type: object
+  models.Class:
+    properties:
+      description:
+        type: string
+      name:
+        type: string
+      ncm:
+        type: string
+    type: object
+  models.Client:
+    properties:
+      address_id:
+        type: integer
+      cpf:
+        type: string
+      name:
+        type: string
+    type: object
+  models.Company:
+    properties:
+      address:
+        type: integer
+      cnpj:
+        type: string
+      inscricao_estadual:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+    type: object
+  models.Invoice:
+    properties:
+      access_key:
+        type: string
+      client_id:
+        type: integer
+      created_at:
+        type: string
+      discount:
+        type: number
+      numero:
+        type: string
+      observation:
+        type: string
+      payment_method_id:
+        type: integer
+      total_value:
+        type: number
+    type: object
+  models.InvoiceItem:
+    properties:
+      invoice_id:
+        type: string
+      price:
+        type: number
+      product_id:
+        type: integer
+      quantity:
+        type: integer
+      valor_total:
+        type: number
+    type: object
+  models.Product:
+    properties:
+      class_id:
+        type: integer
+      code:
+        type: string
+      description:
+        type: string
+      gtin:
+        type: string
+      name:
+        type: string
+      ncm:
+        type: string
+      price:
+        type: number
+      stock:
+        type: integer
+      um:
+        type: string
+      valtrib:
+        type: number
+    type: object
+info:
+  contact: {}
+paths:
+  /api/addresses:
+    get:
+      consumes:
+      - application/json
+      description: Retorna todos os endereços cadastrados
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Lista todos os endereços
+      tags:
+      - address
+    post:
+      consumes:
+      - application/json
+      description: Adiciona um novo endereço ao banco de dados
+      parameters:
+      - description: Dados do endereço
+        in: body
+        name: address
+        required: true
+        schema:
+          $ref: '#/definitions/models.Address'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "422":
+          description: Unprocessable Entity
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Cria um novo endereço
+      tags:
+      - address
+  /api/addresses/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retorna um endereço pelo seu ID
+      parameters:
+      - description: ID do endereço
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Busca endereço por ID
+      tags:
+      - address
+    put:
+      consumes:
+      - application/json
+      description: Atualiza os dados de um endereço existente
+      parameters:
+      - description: ID do endereço
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Dados do endereço
+        in: body
+        name: address
+        required: true
+        schema:
+          $ref: '#/definitions/models.Address'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "422":
+          description: Unprocessable Entity
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Atualiza um endereço
+      tags:
+      - address
+  /api/classes:
+    get:
+      consumes:
+      - application/json
+      description: Retorna todas as classes cadastradas
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Lista todas as classes
+      tags:
+      - class
+    post:
+      consumes:
+      - application/json
+      description: Adiciona uma nova classe ao banco de dados
+      parameters:
+      - description: Dados da classe
+        in: body
+        name: class
+        required: true
+        schema:
+          $ref: '#/definitions/models.Class'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "422":
+          description: Unprocessable Entity
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Cria uma nova classe
+      tags:
+      - class
+  /api/classes/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retorna uma classe pelo seu ID
+      parameters:
+      - description: ID da classe
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Busca classe por ID
+      tags:
+      - class
+    put:
+      consumes:
+      - application/json
+      description: Atualiza os dados de uma classe existente
+      parameters:
+      - description: ID da classe
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Dados da classe
+        in: body
+        name: class
+        required: true
+        schema:
+          $ref: '#/definitions/models.Class'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "422":
+          description: Unprocessable Entity
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Atualiza uma classe
+      tags:
+      - class
+  /api/classes/name/{name}:
+    get:
+      consumes:
+      - application/json
+      description: Retorna classes que contenham o nome informado
+      parameters:
+      - description: Nome da classe
+        in: path
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Busca classes por nome
+      tags:
+      - class
+  /api/clients:
+    get:
+      consumes:
+      - application/json
+      description: Retorna todos os clientes cadastrados
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Lista todos os clientes
+      tags:
+      - client
+    post:
+      consumes:
+      - application/json
+      description: Adiciona um novo cliente ao banco de dados
+      parameters:
+      - description: Dados do cliente
+        in: body
+        name: client
+        required: true
+        schema:
+          $ref: '#/definitions/models.Client'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "422":
+          description: Unprocessable Entity
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Cria um novo cliente
+      tags:
+      - client
+  /api/clients/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Deleta um cliente pelo ID
+      parameters:
+      - description: ID do cliente
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Remove um cliente
+      tags:
+      - client
+    get:
+      consumes:
+      - application/json
+      description: Retorna um cliente pelo seu ID
+      parameters:
+      - description: ID do cliente
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Busca cliente por ID
+      tags:
+      - client
+    put:
+      consumes:
+      - application/json
+      description: Atualiza os dados de um cliente existente
+      parameters:
+      - description: ID do cliente
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Dados do cliente
+        in: body
+        name: client
+        required: true
+        schema:
+          $ref: '#/definitions/models.Client'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "422":
+          description: Unprocessable Entity
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Atualiza um cliente
+      tags:
+      - client
+  /api/clients/cpf/{cpf}:
+    get:
+      consumes:
+      - application/json
+      description: Retorna um cliente pelo CPF informado
+      parameters:
+      - description: CPF do cliente
+        in: path
+        name: cpf
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Busca cliente por CPF
+      tags:
+      - client
+  /api/clients/name/{name}:
+    get:
+      consumes:
+      - application/json
+      description: Retorna clientes que contenham o nome informado
+      parameters:
+      - description: Nome do cliente
+        in: path
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Busca clientes por nome
+      tags:
+      - client
+  /api/company:
+    get:
+      consumes:
+      - application/json
+      description: Retorna todas as empresas cadastradas
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Lista todas as empresas
+      tags:
+      - company
+    post:
+      consumes:
+      - application/json
+      description: Adiciona uma nova empresa ao banco de dados
+      parameters:
+      - description: Dados da empresa
+        in: body
+        name: company
+        required: true
+        schema:
+          $ref: '#/definitions/models.Company'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "422":
+          description: Unprocessable Entity
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Cria uma nova empresa
+      tags:
+      - company
+  /api/company/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retorna uma empresa pelo seu ID
+      parameters:
+      - description: ID da empresa
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Busca empresa por ID
+      tags:
+      - company
+    put:
+      consumes:
+      - application/json
+      description: Atualiza os dados de uma empresa existente
+      parameters:
+      - description: ID da empresa
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Dados da empresa
+        in: body
+        name: company
+        required: true
+        schema:
+          $ref: '#/definitions/models.Company'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "422":
+          description: Unprocessable Entity
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Atualiza uma empresa
+      tags:
+      - company
+  /api/entrar:
+    post:
+      consumes:
+      - application/json
+      description: Autentica uma empresa pelo CNPJ e senha, retornando um token JWT
+      parameters:
+      - description: CNPJ e senha
+        in: body
+        name: credentials
+        required: true
+        schema:
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Autentica uma empresa
+      tags:
+      - company
+  /api/invoice_items:
+    get:
+      consumes:
+      - application/json
+      description: Retorna todos os itens de nota fiscal cadastrados
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Lista todos os itens de nota fiscal
+      tags:
+      - invoice_item
+    post:
+      consumes:
+      - application/json
+      description: Adiciona um novo item à nota fiscal
+      parameters:
+      - description: Dados do item da nota
+        in: body
+        name: invoice_item
+        required: true
+        schema:
+          $ref: '#/definitions/models.InvoiceItem'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "422":
+          description: Unprocessable Entity
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Cria um novo item de nota fiscal
+      tags:
+      - invoice_item
+  /api/invoice_items/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Deleta um item de nota fiscal pelo ID
+      parameters:
+      - description: ID do item da nota
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Remove um item de nota fiscal
+      tags:
+      - invoice_item
+    get:
+      consumes:
+      - application/json
+      description: Retorna um item de nota fiscal pelo seu ID
+      parameters:
+      - description: ID do item da nota
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Busca item de nota fiscal por ID
+      tags:
+      - invoice_item
+    put:
+      consumes:
+      - application/json
+      description: Atualiza os dados de um item de nota fiscal existente
+      parameters:
+      - description: ID do item da nota
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Dados do item da nota
+        in: body
+        name: invoice_item
+        required: true
+        schema:
+          $ref: '#/definitions/models.InvoiceItem'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "422":
+          description: Unprocessable Entity
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Atualiza um item de nota fiscal
+      tags:
+      - invoice_item
+  /api/invoices:
+    get:
+      consumes:
+      - application/json
+      description: Retorna todas as notas fiscais cadastradas
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Lista todas as notas fiscais
+      tags:
+      - invoice
+    post:
+      consumes:
+      - application/json
+      description: Adiciona uma nova nota fiscal ao banco de dados
+      parameters:
+      - description: Dados da nota fiscal
+        in: body
+        name: invoice
+        required: true
+        schema:
+          $ref: '#/definitions/models.Invoice'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "422":
+          description: Unprocessable Entity
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Cria uma nova nota fiscal
+      tags:
+      - invoice
+  /api/invoices/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retorna uma nota fiscal pelo seu ID
+      parameters:
+      - description: ID da nota fiscal
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Busca nota fiscal por ID
+      tags:
+      - invoice
+  /api/payment_methods:
+    get:
+      consumes:
+      - application/json
+      description: Retorna todos os métodos de pagamento cadastrados
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Lista todos os métodos de pagamento
+      tags:
+      - payment_method
+  /api/products:
+    get:
+      consumes:
+      - application/json
+      description: Retorna todos os produtos cadastrados
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Lista todos os produtos
+      tags:
+      - product
+    post:
+      consumes:
+      - application/json
+      description: Adiciona um novo produto ao banco de dados
+      parameters:
+      - description: Dados do produto
+        in: body
+        name: product
+        required: true
+        schema:
+          $ref: '#/definitions/models.Product'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "422":
+          description: Unprocessable Entity
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Cria um novo produto
+      tags:
+      - product
+  /api/products/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Deleta um produto pelo ID
+      parameters:
+      - description: ID do produto
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Remove um produto
+      tags:
+      - product
+    get:
+      consumes:
+      - application/json
+      description: Retorna um produto pelo seu ID
+      parameters:
+      - description: ID do produto
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Busca produto por ID
+      tags:
+      - product
+    put:
+      consumes:
+      - application/json
+      description: Atualiza os dados de um produto existente
+      parameters:
+      - description: ID do produto
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Dados do produto
+        in: body
+        name: product
+        required: true
+        schema:
+          $ref: '#/definitions/models.Product'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "422":
+          description: Unprocessable Entity
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Atualiza um produto
+      tags:
+      - product
+  /api/products/class/{class_id}:
+    get:
+      consumes:
+      - application/json
+      description: Retorna produtos de uma determinada classe
+      parameters:
+      - description: ID da classe
+        in: path
+        name: class_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Busca produtos por classe
+      tags:
+      - product
+  /api/products/name/{name}:
+    get:
+      consumes:
+      - application/json
+      description: Retorna produtos que contenham o nome informado
+      parameters:
+      - description: Nome do produto
+        in: path
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Busca produtos por nome
+      tags:
+      - product
+  /api/sale/add_item:
+    post:
+      consumes:
+      - application/json
+      description: Adiciona um produto à nota fiscal informando quantidade
+      parameters:
+      - description: Dados do item
+        in: body
+        name: data
+        required: true
+        schema:
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "422":
+          description: Unprocessable Entity
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Adiciona um item à nota fiscal
+      tags:
+      - sale
+  /api/sale/draft:
+    post:
+      consumes:
+      - application/json
+      description: Cria uma nota fiscal sem cliente e método de pagamento
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Cria uma nota fiscal rascunho
+      tags:
+      - sale
+  /api/sale/finalize:
+    post:
+      consumes:
+      - application/json
+      description: Finaliza a nota fiscal informando cliente e método de pagamento
+      parameters:
+      - description: Dados para finalizar nota
+        in: body
+        name: data
+        required: true
+        schema:
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "422":
+          description: Unprocessable Entity
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Finaliza a nota fiscal
+      tags:
+      - sale
+  /api/sale/items/{invoice_id}:
+    get:
+      consumes:
+      - application/json
+      description: Retorna todos os itens de uma nota fiscal pelo ID
+      parameters:
+      - description: ID da nota fiscal
+        in: path
+        name: invoice_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Consulta itens de uma nota fiscal
+      tags:
+      - sale
+swagger: "2.0"

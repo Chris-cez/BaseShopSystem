@@ -4,51 +4,17 @@ import (
 	"log"
 	"os"
 
-	"github.com/Chris-cez/BaseShopSystem/models"
+	_ "github.com/Chris-cez/BaseShopSystem/docs"
 	"github.com/Chris-cez/BaseShopSystem/routes"
 	"github.com/Chris-cez/BaseShopSystem/storage"
 	"github.com/gofiber/fiber/v2"
 	"github.com/joho/godotenv"
-	"golang.org/x/crypto/bcrypt"
+	fiberSwagger "github.com/swaggo/fiber-swagger"
 	"gorm.io/gorm"
 )
 
 type Repository struct {
 	DB *gorm.DB
-}
-
-func insertTestData(db *gorm.DB) error {
-	// Verifica se já existe o endereço de teste
-	var count int64
-	db.Model(&models.Address{}).Where("cep = ?", "12345678").Count(&count)
-	if count == 0 {
-		address := models.Address{
-			Logradouro:  "Rua Teste",
-			Numero:      "123",
-			Complemento: "Apto 1",
-			Bairro:      "Centro",
-			Municipio:   "Cidade Teste",
-			UF:          "SP",
-			CEP:         "12345678",
-		}
-		if err := db.Create(&address).Error; err != nil {
-			return err
-		}
-
-		// Cria empresa de teste associada ao endereço
-		hashedPassword, _ := bcrypt.GenerateFromPassword([]byte("senha123"), bcrypt.DefaultCost)
-		company := models.Company{
-			Name:              "Empresa Teste",
-			CNPJ:              "12345678000199",
-			InscricaoEstadual: "ISENTO",
-			Password:          string(hashedPassword),
-			Address_id:        int(address.ID),
-		}
-		if err := db.Create(&company).Error; err != nil {
-			return err
-		}
-	}
-	return nil
 }
 
 func main() {
@@ -77,13 +43,15 @@ func main() {
 	}
 
 	// Inserir dados de teste
-	if err := insertTestData(db); err != nil {
+	if err := InsertTestData(db); err != nil {
 		log.Fatal("Error inserting test data\n", err)
 	}
 
 	app := fiber.New()
 
 	routes.SetupRoutes(app, db)
+
+	app.Get("/swagger/*", fiberSwagger.WrapHandler)
 
 	log.Fatal(app.Listen(":8080"))
 }

@@ -54,10 +54,20 @@ func (r *SaleRepository) AddItemToInvoice(c *fiber.Ctx) error {
 	if err := c.BodyParser(&req); err != nil {
 		return c.Status(http.StatusUnprocessableEntity).JSON(&fiber.Map{"message": "invalid request"})
 	}
+	// Buscar o preço do produto
+	var product models.Product
+	if err := r.DB.First(&product, req.ProductID).Error; err != nil {
+		return c.Status(http.StatusBadRequest).JSON(&fiber.Map{"message": "product not found"})
+	}
+	valorTotal := product.Price * float64(req.Quantity)
+
 	item := models.InvoiceItem{
 		InvoiceID: req.InvoiceID,
 		ProductID: req.ProductID,
 		Quantity:  req.Quantity,
+
+		Price:     product.Price,
+		ValorTotal: valorTotal,
 	}
 	if err := r.DB.Create(&item).Error; err != nil {
 		return c.Status(http.StatusBadRequest).JSON(&fiber.Map{"message": "could not add item"})
@@ -93,6 +103,20 @@ func (r *SaleRepository) FinalizeInvoice(c *fiber.Ctx) error {
 	}
 	invoice.ClientID = req.ClientID
 	invoice.PaymentMethodID = req.PaymentMethodID
+
+	// Preenche o campo AccessKey ao finalizar
+	if invoice.AccessKey == "" {
+		invoice.AccessKey = uuid.NewString()
+	}
+	// Calcular o total da nota somando os valor_total dos itens
+	var items []models.InvoiceItem
+	r.DB.Where("invoice_id = ?", invoice.Numero).Find(&items)
+	total := 0.0
+	for _, item := range items {
+		total += item.ValorTotal
+	}
+	invoice.TotalValue = total
+
 	if err := r.DB.Save(&invoice).Error; err != nil {
 		return c.Status(http.StatusBadRequest).JSON(&fiber.Map{"message": "could not finalize invoice"})
 	}

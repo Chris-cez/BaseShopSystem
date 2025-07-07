@@ -34,6 +34,11 @@ func (r *ProductRepository) CreateProduct(c *fiber.Ctx) error {
 			&fiber.Map{"message": "Request failed"})
 		return err
 	}
+	if product.Price <= 0 {
+		c.Status(http.StatusBadRequest).JSON(
+			&fiber.Map{"message": "product price must be greater than zero"})
+		return nil
+	}
 	err = r.DB.Create(&product).Error
 	if err != nil {
 		c.Status(http.StatusBadRequest).JSON(
@@ -191,6 +196,12 @@ func (r *ProductRepository) UpdateProduct(c *fiber.Ctx) error {
 		c.Status(http.StatusUnprocessableEntity).JSON(
 			&fiber.Map{"message": "Request failed"})
 		return err
+	}
+
+	if updateData.Price <= 0 {
+		c.Status(http.StatusBadRequest).JSON(
+			&fiber.Map{"message": "product price must be greater than zero"})
+		return nil
 	}
 
 	product.Code = updateData.Code

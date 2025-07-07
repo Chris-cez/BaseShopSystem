@@ -299,3 +299,126 @@ class ItemVenda {
     required this.valorTotal,
   });
 }
+
+class VendaService {
+  final Dio api;
+  final String token;
+  VendaService(this.api, this.token);
+
+  Future<List<Venda>> listarVendas() async {
+    final clientes = await _clientes();
+    final metodos = await _metodosPagamento();
+    final produtos = await _produtos();
+    final resp = await api.get(
+      '/api/invoices',
+      options: Options(headers: {'Authorization': 'Bearer $token'}),
+    );
+    List<Venda> vendas = [];
+    for (final j in resp.data['data']) {
+      final itens = await listarItens(j['numero'], produtos);
+      final accessKey = j['access_key']?.toString() ?? '';
+      // Usa sempre o campo total_value do backend para o total da venda
+      double total = (j['total_value'] ?? 0).toDouble();
+      vendas.add(Venda(
+        numero: j['numero'] ?? '',
+        cliente: clientes[j['client_id']?.toString() ?? ''] ?? '-',
+        total: total,
+        metodoPagamento: metodos[j['payment_method_id']?.toString() ?? ''] ?? '-',
+        desconto: (j['discount'] ?? 0).toDouble(),
+        observacao: j['observation'] ?? '',
+        finalizada: accessKey.isNotEmpty,
+        itens: itens,
+      ));
+    }
+    return vendas;
+  }
+
+  Future<List<ItemVenda>> listarItens(String numero, Map<String, String> produtos) async {
+    final resp = await api.get(
+      '/api/sale/items/$numero',
+      options: Options(headers: {'Authorization': 'Bearer $token'}),
+    );
+    return [
+      for (final j in resp.data['items'])
+        ItemVenda(
+          produto: produtos[j['product_id'].toString()] ?? 'Produto',
+          quantidade: (j['quantity'] is int) ? j['quantity'] : int.tryParse(j['quantity'].toString()) ?? 0,
+          valorUnitario: (j['price'] is double) ? j['price'] : double.tryParse(j['price'].toString()) ?? 0.0,
+          valorTotal: (j['valor_total'] is double) ? j['valor_total'] : double.tryParse(j['valor_total'].toString()) ?? 0.0,
+        )
+    ];
+  }
+
+  Future<String> criarVenda() async {
+    final resp = await api.post(
+      '/api/sale/draft',
+      options: Options(headers: {'Authorization': 'Bearer $token'}),
+    );
+    return resp.data['invoice_id'] ?? '';
+  }
+
+  Future<void> adicionarItem(String numero, String produtoId, int quantidade) async {
+    await api.post(
+      '/api/sale/add_item',
+      data: {
+        'invoice_id': numero,
+        'product_id': int.parse(produtoId),
+        'quantity': quantidade,
+      },
+      options: Options(headers: {'Authorization': 'Bearer $token'}),
+    );
+  }
+
+  Future<void> finalizarVenda(String numero, String clienteId, String metodoPagamentoId) async {
+    await api.post(
+      '/api/sale/finalize',
+      data: {
+        'invoice_id': numero,
+        'client_id': int.parse(clienteId),
+        'payment_method_id': int.parse(metodoPagamentoId),
+      },
+      options: Options(headers: {'Authorization': 'Bearer $token'}),
+    );
+  }
+
+  // Mocks para nomes (substitua por chamadas reais)
+  Future<Map<String, String>> _clientes() async {
+    final resp = await api.get(
+      '/api/clients',
+      options: Options(headers: {'Authorization': 'Bearer $token'}),
+    );
+    final data = resp.data['data'] as List<dynamic>?;
+    if (data == null) return {};
+    return {
+      for (final c in data)
+        (c['ID']?.toString() ?? c['id']?.toString() ?? ''): c['name'] ?? ''
+    };
+  }
+
+  Future<Map<String, String>> _metodosPagamento() async {
+    final resp = await api.get(
+      '/api/payment_methods',
+      options: Options(headers: {'Authorization': 'Bearer $token'}),
+    );
+    final data = resp.data['data'] as List<dynamic>?;
+    if (data == null) return {};
+    return {
+      for (final m in data)
+        (m['ID']?.toString() ?? m['id']?.toString() ?? ''): m['name'] ?? ''
+    };
+  }
+
+  // Busca produtos reais do backend
+  Future<Map<String, String>> _produtos() async {
+    final resp = await api.get(
+      '/api/products',
+      options: Options(headers: {'Authorization': 'Bearer $token'}),
+    );
+    final data = resp.data['data'] as List<dynamic>?;
+    if (data == null) return {};
+    return {
+      for (final p in data)
+        (p['ID']?.toString() ?? p['id']?.toString() ?? ''): p['name'] ?? ''
+    };
+  }
+}

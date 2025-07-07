@@ -33,6 +33,16 @@ func (r *InvoiceItemRepository) CreateInvoiceItem(c *fiber.Ctx) error {
 			&fiber.Map{"message": "Request failed"})
 		return err
 	}
+	// Busca o preço do produto e calcula valor_total
+	var product models.Product
+	if err := r.DB.First(&product, invoiceItem.ProductID).Error; err != nil {
+		c.Status(http.StatusBadRequest).JSON(
+			&fiber.Map{"message": "product not found"})
+		return err
+	}
+	invoiceItem.Price = product.Price
+	invoiceItem.ValorTotal = product.Price * float64(invoiceItem.Quantity)
+
 	err = r.DB.Create(&invoiceItem).Error
 	if err != nil {
 		c.Status(http.StatusBadRequest).JSON(
@@ -137,6 +147,16 @@ func (r *InvoiceItemRepository) UpdateInvoiceItem(c *fiber.Ctx) error {
 			&fiber.Map{"message": "Request failed"})
 		return err
 	}
+
+	// Busca o preço do produto e recalcula valor_total
+	var product models.Product
+	if err := r.DB.First(&product, invoiceItem.ProductID).Error; err != nil {
+		c.Status(http.StatusBadRequest).JSON(
+			&fiber.Map{"message": "product not found"})
+		return err
+	}
+	invoiceItem.Price = product.Price
+	invoiceItem.ValorTotal = product.Price * float64(invoiceItem.Quantity)
 
 	err = r.DB.Save(&invoiceItem).Error
 	if err != nil {

@@ -60,10 +60,12 @@ func (r *SaleRepository) AddItemToInvoice(c *fiber.Ctx) error {
 		return c.Status(http.StatusBadRequest).JSON(&fiber.Map{"message": "product not found"})
 	}
 	valorTotal := product.Price * float64(req.Quantity)
+
 	item := models.InvoiceItem{
 		InvoiceID: req.InvoiceID,
 		ProductID: req.ProductID,
 		Quantity:  req.Quantity,
+
 		Price:     product.Price,
 		ValorTotal: valorTotal,
 	}
@@ -101,6 +103,7 @@ func (r *SaleRepository) FinalizeInvoice(c *fiber.Ctx) error {
 	}
 	invoice.ClientID = req.ClientID
 	invoice.PaymentMethodID = req.PaymentMethodID
+
 	// Preenche o campo AccessKey ao finalizar
 	if invoice.AccessKey == "" {
 		invoice.AccessKey = uuid.NewString()
@@ -113,6 +116,7 @@ func (r *SaleRepository) FinalizeInvoice(c *fiber.Ctx) error {
 		total += item.ValorTotal
 	}
 	invoice.TotalValue = total
+
 	if err := r.DB.Save(&invoice).Error; err != nil {
 		return c.Status(http.StatusBadRequest).JSON(&fiber.Map{"message": "could not finalize invoice"})
 	}

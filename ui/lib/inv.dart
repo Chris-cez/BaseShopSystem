@@ -298,6 +298,7 @@ class ItemVenda {
     required this.valorUnitario,
     required this.valorTotal,
   });
+
 }
 
 class VendaService {
@@ -421,4 +422,5 @@ class VendaService {
         (p['ID']?.toString() ?? p['id']?.toString() ?? ''): p['name'] ?? ''
     };
   }
+
 }

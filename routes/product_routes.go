@@ -203,7 +203,6 @@ func (r *ProductRepository) UpdateProduct(c *fiber.Ctx) error {
 			&fiber.Map{"message": "product price must be greater than zero"})
 		return nil
 	}
-
 	product.Code = updateData.Code
 	product.Price = updateData.Price
 	product.Name = updateData.Name
